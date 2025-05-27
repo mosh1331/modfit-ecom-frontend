@@ -1,0 +1,10 @@
+{
+    "header": {
+      "title": "Welcome to My App",
+      "description": "This is a multilingual application"
+    },
+    "home": {
+      "greeting": "Hello, world!",
+      "welcome": "Welcome to our platform"
+    }
+  }
