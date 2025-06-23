@@ -1,10 +1,26 @@
 // LandingPage.jsx
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Mail, Star } from 'lucide-react';
 import ProductThreeSixty from '../productView/ProductThreeSixty'
+import axios from 'axios';
+import Upload360Images from '../upload360Images/Upload360'
 
 const LandingPage = () => {
+  const [session_id, setSessionId] = useState("dummy_session_test");
+
+  const fetchData = async () => {
+    const data = { name: 'test user 1', email: 'test@gmail.com', password: 'test123' }
+    const response = await axios.post('http://localhost:5001/api/auth/register', data)
+    console.log(response, 'response')
+
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  return <Upload360Images/>
 
   return (
     <div className="font-sans bg-white text-gray-900 relative">
@@ -13,10 +29,10 @@ const LandingPage = () => {
         <div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Elegant Modest Wear for Every Occasion</h1>
           <p className="mb-6 text-lg text-gray-700">Experience our 360° view to explore every detail of your perfect look.</p>
-          <button className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Shop Collection</button>
+          <button onClick={()=>fetchData()} className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Shop Collection</button>
         </div>
         <div className="rounded-xl overflow-hidden shadow-lg w-1/2">
-          <ProductThreeSixty/>
+          {/* <ProductThreeSixty /> */}
         </div>
       </section>
 
