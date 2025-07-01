@@ -2,16 +2,18 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { Mail, Star } from 'lucide-react';
-import ProductThreeSixty from '../productView/ProductThreeSixty'
-import axios from 'axios';
-import Upload360Images from '../upload360Images/Upload360'
+import { apiServices } from '@/service/apiService';
+import Loader from '../loader/Loader';
+import Link from 'next/link';
+
 
 const LandingPage = () => {
   const [session_id, setSessionId] = useState("dummy_session_test");
 
   const fetchData = async () => {
-    const data = { name: 'test user 1', email: 'test@gmail.com', password: 'test123' }
-    const response = await axios.post('http://localhost:5001/api/auth/register', data)
+    // const data = { name: 'test user 1', email: 'test@gmail.com', password: 'test123' }
+    const response = await apiServices().getProducts()
+    // const response = await axios.post('http://localhost:5001/api/auth/register', data)
     console.log(response, 'response')
 
   }
@@ -20,7 +22,6 @@ const LandingPage = () => {
     fetchData()
   }, [])
 
-  return <Upload360Images/>
 
   return (
     <div className="font-sans bg-white text-gray-900 relative">
@@ -29,7 +30,7 @@ const LandingPage = () => {
         <div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Elegant Modest Wear for Every Occasion</h1>
           <p className="mb-6 text-lg text-gray-700">Experience our 360° view to explore every detail of your perfect look.</p>
-          <button onClick={()=>fetchData()} className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Shop Collection</button>
+          <Link href={`/products`}  className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Shop Collection</Link>
         </div>
         <div className="rounded-xl overflow-hidden shadow-lg w-1/2">
           {/* <ProductThreeSixty /> */}
