@@ -11,7 +11,7 @@ const ThreeSixty = dynamic(() => import('react-360-view'), {
 
 const ProductThreeSixty = ({ images }) => {
   const [showIcon, setShowIcon] = useState(true)
-  console.log(images, 'images 360')
+  console.log(images[0], 'images 360')
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowIcon(false)
@@ -26,10 +26,10 @@ const ProductThreeSixty = ({ images }) => {
   return (
     <div className='relative bg-amber-400 w-full h-[80vh] '>
       <ThreeSixty
-        amount={16}
+        amount={8}
         imagePath={imagePath}
-        // imagePath="https://res.cloudinary.com/dnrruxh6u/image/upload/360/product_09"
-        fileName="image_{index}.jpg"
+        // imagePath="https://res.cloudinary.com/dnrruxh6u/image/upload/360/Product_11"
+        fileName="image_{index}.webp"
       />
       {/* 360 Icon */}
       {showIcon && (

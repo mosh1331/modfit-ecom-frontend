@@ -8,7 +8,7 @@ import { Product } from '@/type/productType';
 import ProductThreeSixty from '../productView/ProductThreeSixty'
 import ModtifLoader from '../loader/ModtifLoader';
 
-// 
+
 export default function ProductDetailPage({slug}:{slug:string}) {
 
   console.log(slug,'idddd')
