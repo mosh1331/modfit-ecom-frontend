@@ -19,19 +19,33 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const handleDelete =async(id:string)=>{
+    setLoading(true)
+    const response = await apiServices().deleteProductById(id)
+    console.log(response,'response delete')
+    fetchList()
+    setLoading(false)
+
+  }
+
+
+  const fetchList =() =>{
     apiServices()
-      .getProducts()
-      .then((res: any) => {
-        if (res?.status === 200) {
-          setProducts(res.data);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Failed to fetch products:', err);
-        setLoading(false);
-      });
+    .getProducts()
+    .then((res: any) => {
+      if (res?.status === 200) {
+        setProducts(res.data);
+      }
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error('Failed to fetch products:', err);
+      setLoading(false);
+    });
+  }
+
+  useEffect(() => {
+    fetchList()
   }, []);
 
   if (loading) return <ModtifLoader />;
@@ -85,6 +99,9 @@ export default function ProductsPage() {
                   </div>
                   <button className="bg-black text-white text-sm px-4 py-1.5 rounded hover:bg-gray-800 transition">
                     Add to Cart
+                  </button>
+                  <button onClick={()=>handleDelete(product?.id)} className="bg-black text-white text-sm px-4 py-1.5 rounded hover:bg-gray-800 transition">
+                    Delete
                   </button>
                 </div>
               </div>
