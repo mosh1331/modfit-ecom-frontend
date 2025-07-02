@@ -22,6 +22,15 @@ export const apiServices = () => {
         }
       })
     },
+    deleteProductById: (slug) => {
+      return publicAPI({
+        method: 'DELETE',
+        url: `/api/products/${slug}`,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+    },
     createProduct: (data:any) => {
         return publicAPI({
           method: 'POST',
