@@ -135,7 +135,7 @@ export default function CreateProduct() {
   return (
     <form
       onSubmit={handleSubmit}
-      className='max-w-2xl mx-auto p-6 bg-white rounded shadow space-y-6'
+      className='text-black max-w-2xl mx-auto p-6 bg-white rounded shadow space-y-6'
     >
       <h2 className='text-2xl font-semibold text-center'>Create Product</h2>
 
