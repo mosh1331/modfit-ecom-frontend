@@ -7,6 +7,7 @@ import ModtifLoader from '../loader/ModtifLoader'
 
 interface ProductFormData {
   name: string
+  folder_name:string
   description: string
   category: string
   price: string // keeping as string for input
@@ -29,12 +30,12 @@ export default function CreateProduct() {
     colors: [],
     images: [],
     image360: [],
-    inStock: true
+    inStock: true,
+    folder_name:''
   })
 
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
   const [image360Previews, setImage360Previews] = useState<string[]>([])
-  const [folderName, setFolderName] = useState<string>('product_09')
   const [loading, setLoading] = useState<boolean>(false)
 
   const BASE_URL = process.env.NEXT_PUBLIC_API
@@ -78,7 +79,7 @@ export default function CreateProduct() {
       form.images.forEach(file => imageForm.append('images', file))
 
       const regUploadRes = await axios.post(
-        `${BASE_URL}/api/cloudinary/upload?folderName=${folderName}`,
+        `${BASE_URL}/api/cloudinary/upload?folderName=${form.folder_name}`,
         imageForm,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
@@ -93,7 +94,7 @@ export default function CreateProduct() {
       form.image360.forEach(file => image360Form.append('images', file))
 
       const upload360Res = await axios.post(
-        `${BASE_URL}/api/cloudinary/upload360?folderName=${folderName}`,
+        `${BASE_URL}/api/cloudinary/upload360?folderName=${form.folder_name}`,
         image360Form,
         {
           headers: { 'Content-Type': 'multipart/form-data' },
@@ -120,7 +121,6 @@ export default function CreateProduct() {
         },
         { withCredentials: true }
       )
-      setFolderName('')
       setLoading(false)
       alert('Product created successfully!')
     } catch (err) {
@@ -141,6 +141,7 @@ export default function CreateProduct() {
 
       {[
         { label: 'Name', name: 'name' },
+        { label: 'Folder', name: 'folder_name' },
         { label: 'Description', name: 'description' },
         { label: 'Category', name: 'category' },
         { label: 'Price', name: 'price', type: 'number' },
