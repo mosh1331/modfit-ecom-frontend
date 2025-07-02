@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { apiServices } from '@/service/apiService';
 import Link from 'next/link';
+import ModtifLoader from '../loader/ModtifLoader';
 
 type Product = {
   id: string;
@@ -33,7 +34,7 @@ export default function ProductsPage() {
       });
   }, []);
 
-  if (loading) return <p className="text-center py-10">Loading...</p>;
+  if (loading) return <ModtifLoader />;
 
   return (
     <div className="bg-white min-h-screen py-10 px-4 sm:px-6 lg:px-12">

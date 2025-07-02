@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '@/type/productType';
 import ProductThreeSixty from '../productView/ProductThreeSixty'
+import ModtifLoader from '../loader/ModtifLoader';
 
 // 
 export default function ProductDetailPage({slug}:{slug:string}) {
@@ -25,7 +26,7 @@ export default function ProductDetailPage({slug}:{slug:string}) {
     }
   }, [slug]);
 
-  if (!product) return <p className="text-center py-10">Loading...</p>;
+  if (!product) return <ModtifLoader />;
 
   return (
     <div className="bg-white min-h-screen px-4 py-10 sm:px-6 lg:px-16">
