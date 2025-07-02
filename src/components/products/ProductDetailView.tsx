@@ -1,13 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
 import { apiServices } from '@/service/apiService';
-import { ThreeSixty } from 'react-360-view';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '@/type/productType';
-
+import ProductThreeSixty from '../productView/ProductThreeSixty'
 
 // 
 export default function ProductDetailPage({slug}:{slug:string}) {
@@ -36,16 +34,17 @@ export default function ProductDetailPage({slug}:{slug:string}) {
         {/* Image Viewer */}
         <div className="w-full lg:w-1/2">
           <div className="rounded border overflow-hidden mb-4">
-            {product.image360 ? (
-              <ThreeSixty
-                amount={36}
-                imagePath={product.image360}
-                fileName="image_{index}.jpg"
-                width={500}
-                height={500}
-                spinReverse
-                autoplay
-              />
+            {product.images360 ? (
+            //   <ThreeSixty
+            //     amount={8}
+            //     imagePath={'https://res.cloudinary.com/dnrruxh6u/image/upload/360/product_09'}
+            //     fileName={`image_${index}.jpg`}
+            //     width={500}
+            //     height={500}
+            //     spinReverse
+            //     autoplay
+            //   />
+              <ProductThreeSixty images={product.images360} />
             ) : (
               <img
                 src={product.images[0]}
@@ -90,7 +89,7 @@ export default function ProductDetailPage({slug}:{slug:string}) {
 
           {/* Stock */}
           <p className="mt-2 text-sm text-gray-500">
-            {product.stock > 0 ? `${product.stock} pieces left` : 'Out of stock'}
+            {/* {product.inStock > 0 ? `${product.inStock} pieces left` : 'Out of stock'} */}
           </p>
 
           {/* Add to Cart */}

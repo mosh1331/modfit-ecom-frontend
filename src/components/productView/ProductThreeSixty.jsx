@@ -1,5 +1,6 @@
 // components/ProductThreeSixty.jsx
 'use client'
+import { getBaseCloudinaryUrl } from '@/utils/helper';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 
@@ -8,9 +9,9 @@ const ThreeSixty = dynamic(() => import('react-360-view'), {
 });
 
 
-const ProductThreeSixty = () => {
+const ProductThreeSixty = ({ images }) => {
   const [showIcon, setShowIcon] = useState(true)
-
+  console.log(images, 'images 360')
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowIcon(false)
@@ -19,12 +20,15 @@ const ProductThreeSixty = () => {
     return () => clearTimeout(timer)
   }, [])
 
+  const imagePath = images && images?.length > 0 ? getBaseCloudinaryUrl(images[0]) : null
+  console.log(imagePath, 'imagePath')
 
   return (
     <div className='relative bg-amber-400 w-full h-[80vh] '>
       <ThreeSixty
         amount={8}
-        imagePath="https://res.cloudinary.com/dnrruxh6u/image/upload/360/product_09"
+        imagePath={imagePath}
+        // imagePath="https://res.cloudinary.com/dnrruxh6u/image/upload/360/product_09"
         fileName="image_{index}.jpg"
       />
       {/* 360 Icon */}

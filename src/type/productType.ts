@@ -8,5 +8,6 @@ export interface Product {
     colors: string[];
     images: string[];
     image360?: string[];
+    images360?: string[];
     inStock: boolean;
 }
