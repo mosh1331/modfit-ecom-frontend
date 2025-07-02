@@ -13,6 +13,15 @@ export const apiServices = () => {
         }
       })
     },
+    getProductById: (slug) => {
+      return publicAPI({
+        method: 'GET',
+        url: `/api/products/${slug}`,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+    },
     createProduct: (data:any) => {
         return publicAPI({
           method: 'POST',

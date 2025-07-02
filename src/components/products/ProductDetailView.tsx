@@ -1,146 +1,145 @@
-// @ts-nocheck
-'use client'
-import React, { useEffect, useState } from 'react'
-import ProductThreeSixty from '../productView/ProductThreeSixty';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { apiServices } from '@/service/apiService';
+import { ThreeSixty } from 'react-360-view';
+import Image from 'next/image';
+import Link from 'next/link';
 import { Product } from '@/type/productType';
 
 
+// 
+export default function ProductDetailPage({slug}:{slug:string}) {
 
-const ProductDetailView = ({slug}:{slug:string}) => {
-    console.log(slug,'slug')
+  console.log(slug,'idddd')
+  const [product, setProduct] = useState<Product | null>(null);
 
-    const getProducts = async () => {
-        const response = await apiServices().getProducts()
-        console.log(response.data, 'ress')
-        if (response.status === 200) {
-            setProduct(response?.data[0])
-        }
+  useEffect(() => {
+    if (slug) {
+      apiServices()
+        .getProductById(slug)
+        .then((res: any) => {
+          if (res?.status === 200) {
+            setProduct(res.data);
+          }
+        });
     }
-    useEffect(() => {
-        getProducts()
-    }, [])
+  }, [slug]);
 
-    const [product, setProduct] = useState<Product | null>(null)
+  if (!product) return <p className="text-center py-10">Loading...</p>;
 
-    console.log(product, 'product')
+  return (
+    <div className="bg-white min-h-screen px-4 py-10 sm:px-6 lg:px-16">
+      {/* Product Display */}
+      <div className="flex flex-col lg:flex-row gap-10">
+        {/* Image Viewer */}
+        <div className="w-full lg:w-1/2">
+          <div className="rounded border overflow-hidden mb-4">
+            {product.image360 ? (
+              <ThreeSixty
+                amount={36}
+                imagePath={product.image360}
+                fileName="image_{index}.jpg"
+                width={500}
+                height={500}
+                spinReverse
+                autoplay
+              />
+            ) : (
+              <img
+                src={product.images[0]}
+                alt={product.name}
+                width={600}
+                height={600}
+                className="object-cover w-full rounded"
+              />
+            )}
+          </div>
 
-
-    return (
-        <div className="max-w-6xl mx-auto px-4 py-6 text-gray-800">
-            {/* Product Main Grid */}
-            <div className="grid md:grid-cols-2 gap-8">
-                {/* Left Side: Image Gallery */}
-                <div>
-                    <div className="w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                        {product?.images ? (
-                            <img
-                                src={product?.images[0]}
-                                alt="Selected"
-                                className="object-contain h-full w-full"
-                            />
-                        ) : (
-                            <span className="text-gray-400">No image</span>
-                        )}
-                    </div>
-                    <ProductThreeSixty />
-                    <div className="mt-4 flex flex-wrap gap-3">
-                        {product?.images?.map((img, i) => (
-                            <img
-                                key={i}
-                                src={img}
-                                alt={`Thumb-${i}`}
-                                // onClick={() => setSelectedImage(img)}
-                                // className={`w-16 h-16 object-cover rounded border cursor-pointer ${
-                                //   selectedImage === img ? 'ring-2 ring-blue-400' : ''
-                                // }`}
-                                className={`w-16 h-16 object-cover rounded border cursor-pointer `}
-                            />
-                        ))}
-                    </div>
-                </div>
-
-                {/* Right Side: Product Info */}
-                <div className="flex flex-col space-y-4">
-                    <h1 className="text-2xl md:text-3xl font-semibold">{product?.name}</h1>
-                    <p className="text-sm text-gray-500">{product?.category}</p>
-
-                    <div className="text-xl font-bold text-green-700">
-                        ₹{product?.discountedPrice || product?.price}
-                        {product?.discountedPrice && (
-                            <span className="text-gray-400 line-through text-sm ml-2">
-                                ₹{product?.price}
-                            </span>
-                        )}
-                    </div>
-
-                    <p className="text-gray-600">{product?.description}</p>
-
-                    <div>
-                        <h4 className="font-semibold mb-1">Sizes:</h4>
-                        <div className="flex gap-2 flex-wrap">
-                            {product?.sizes?.map((size) => (
-                                <span
-                                    key={size}
-                                    className="border px-3 py-1 rounded text-sm bg-white hover:bg-gray-100"
-                                >
-                                    {size}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div>
-                        <h4 className="font-semibold mb-1">Colors:</h4>
-                        <div className="flex gap-2">
-                            {product?.colors?.map((color, i) => (
-                                <div
-                                    key={i}
-                                    className="w-6 h-6 rounded-full border"
-                                    style={{ backgroundColor: color }}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="text-sm text-gray-700">
-                        <strong>Status:</strong>{' '}
-                        {product?.inStock ? (
-                            <span className="text-green-600">In Stock</span>
-                        ) : (
-                            <span className="text-red-500">Out of Stock</span>
-                        )}
-                    </div>
-
-                    <button
-                        className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-                        disabled={!product?.inStock}
-                    >
-                        {product?.inStock ? 'Add to Cart' : 'Out of Stock'}
-                    </button>
-                </div>
-            </div>
-
-            {/* 360 View */}
-            {product?.image360 && product?.image360?.length > 0 ? (
-                <div className="mt-10">
-                    <h2 className="text-xl font-semibold mb-4">360° View</h2>
-                    <div className="flex overflow-x-auto gap-4">
-                        {product.image360.map((img, idx) => (
-                            <img
-                                key={idx}
-                                src={img}
-                                alt={`360-${idx}`}
-                                className="h-48 rounded object-contain bg-gray-100"
-                            />
-                        ))}
-                    </div>
-                </div>
-            ):null}
+          <div className="grid grid-cols-4 gap-2">
+            {product.images.map((img, i) => (
+              <img
+                key={i}
+                src={img}
+                alt={`Thumb ${i}`}
+                width={100}
+                height={100}
+                className="rounded object-cover border hover:ring-2 hover:ring-black transition"
+              />
+            ))}
+          </div>
         </div>
-    );
+
+        {/* Product Info */}
+        <div className="w-full lg:w-1/2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{product.name}</h1>
+          <p className="mt-2 text-gray-600 text-sm sm:text-base">{product.description}</p>
+
+          {/* Pricing */}
+          <div className="mt-4 flex items-center gap-3">
+            <span className="text-xl sm:text-2xl font-semibold text-red-600">
+              ${product.discountedPrice || product.price}
+            </span>
+            {product.discountedPrice && (
+              <span className="line-through text-gray-400 text-sm sm:text-base">
+                ${product.price}
+              </span>
+            )}
+          </div>
+
+          {/* Stock */}
+          <p className="mt-2 text-sm text-gray-500">
+            {product.stock > 0 ? `${product.stock} pieces left` : 'Out of stock'}
+          </p>
+
+          {/* Add to Cart */}
+          <button className="mt-6 w-full sm:w-auto bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition">
+            Add to Cart
+          </button>
+
+          <p className="mt-4 text-sm text-gray-500">Category: {product.category}</p>
+        </div>
+      </div>
+
+      {/* Combo Offers */}
+      <div className="mt-16">
+        <h2 className="text-xl sm:text-2xl font-bold mb-6 text-gray-800">
+          Combo Offers You’ll Love
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((combo) => (
+            <div
+              key={combo}
+              className="p-4 border rounded-lg shadow-sm hover:shadow-md transition bg-gray-50"
+            >
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <Image
+                  src="/images/product_01/image_01.jpg"
+                  alt="Combo Product"
+                  width={80}
+                  height={80}
+                  className="rounded object-cover"
+                />
+                <span className="text-xl font-semibold">+</span>
+                <Image
+                  src="/images/shawl.jpg"
+                  alt="Shawl"
+                  width={80}
+                  height={80}
+                  className="rounded object-cover"
+                />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800">Hoodie + Shawl Combo</h3>
+              <p className="text-sm text-gray-500 mt-1">Perfect match for chilly days</p>
+              <div className="mt-2 text-red-600 font-bold text-lg">$79.99</div>
+              <Link href="/combo/hoodie-shawl" className="mt-3 inline-block text-sm text-blue-600 underline">
+                View Combo
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
-
-
-export default ProductDetailView
-
