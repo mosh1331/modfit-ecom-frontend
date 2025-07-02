@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { apiServices } from '@/service/apiService';
 import Link from 'next/link';
-import Image from 'next/image';
 
 type Product = {
   id: string;

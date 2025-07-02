@@ -25,7 +25,7 @@ function createAuthAPI (): AxiosInstance {
   }
 
   // Attach access token to each request
-  //@ts-ignore
+  //@ts-expect-error
   instance.interceptors.request.use((config: AxiosRequestConfig) => {
     const { auth } = store.getState()
     if (auth.accessToken) {

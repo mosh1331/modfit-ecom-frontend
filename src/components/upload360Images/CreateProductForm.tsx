@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 'use client'
 import { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
@@ -109,7 +111,7 @@ export default function CreateProduct() {
         },
         { withCredentials: true }
       );
-
+      setFolderName('')
       alert("Product created successfully!");
     } catch (err) {
       console.error(err);
@@ -135,7 +137,6 @@ export default function CreateProduct() {
           <input
             type={type}
             name={name}
-            //@ts-ignore
             value={form[name]}
             onChange={handleInputChange}
             required={["name", "description", "category", "price"].includes(name)}
