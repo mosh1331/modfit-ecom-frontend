@@ -26,7 +26,7 @@ const ProductThreeSixty = ({ images }) => {
   return (
     <div className='relative bg-amber-400 w-full h-[80vh] '>
       <ThreeSixty
-        amount={8}
+        amount={16}
         imagePath={imagePath}
         // imagePath="https://res.cloudinary.com/dnrruxh6u/image/upload/360/product_09"
         fileName="image_{index}.jpg"
