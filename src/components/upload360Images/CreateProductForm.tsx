@@ -4,6 +4,7 @@
 import { useState, ChangeEvent, FormEvent } from 'react'
 import axios from 'axios'
 import ModtifLoader from '../loader/ModtifLoader'
+import { useRouter } from 'next/navigation'
 
 interface ProductFormData {
   name: string
@@ -39,6 +40,7 @@ export default function CreateProduct() {
   const [loading, setLoading] = useState<boolean>(false)
 
   const BASE_URL = process.env.NEXT_PUBLIC_API
+  const router = useRouter();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -123,6 +125,8 @@ export default function CreateProduct() {
       )
       setLoading(false)
       alert('Product created successfully!')
+
+    router.push('/products');
     } catch (err) {
       console.error(err)
       setLoading(false)
