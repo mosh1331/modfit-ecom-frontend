@@ -5,14 +5,13 @@ import { apiServices } from '@/service/apiService';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '@/type/productType';
-import ProductThreeSixty from '../productView/ProductThreeSixty'
+import Zoom from 'react-medium-image-zoom';
+import 'react-medium-image-zoom/dist/styles.css';
 import ModtifLoader from '../loader/ModtifLoader';
 
-
-export default function ProductDetailPage({slug}:{slug:string}) {
-
-  console.log(slug,'idddd')
+export default function ProductDetailPage({ slug }: { slug: string }) {
   const [product, setProduct] = useState<Product | null>(null);
+  const [mainImage, setMainImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (slug) {
@@ -21,6 +20,7 @@ export default function ProductDetailPage({slug}:{slug:string}) {
         .then((res: any) => {
           if (res?.status === 200) {
             setProduct(res.data);
+            setMainImage(res.data.images[0]); // Default main image
           }
         });
     }
@@ -30,48 +30,46 @@ export default function ProductDetailPage({slug}:{slug:string}) {
 
   return (
     <div className="bg-white min-h-screen px-4 py-10 sm:px-6 lg:px-16">
-      {/* Product Display */}
+      {/* Product Section */}
       <div className="flex flex-col lg:flex-row gap-10">
         {/* Image Viewer */}
         <div className="w-full lg:w-1/2">
-          <div className="rounded border overflow-hidden mb-4">
-            {product.images360 ? (
-            //   <ThreeSixty
-            //     amount={8}
-            //     imagePath={'https://res.cloudinary.com/dnrruxh6u/image/upload/360/product_09'}
-            //     fileName={`image_${index}.jpg`}
-            //     width={500}
-            //     height={500}
-            //     spinReverse
-            //     autoplay
-            //   />
-              <ProductThreeSixty images={product.images360} />
-            ) : (
+          {/* Main Image with Zoom */}
+          <div className="border rounded overflow-hidden h-[400px] sm:h-[500px] mb-4 flex items-center justify-center bg-gray-100">
+            <Zoom>
               <img
-                src={product.images[0]}
+                src={mainImage!}
                 alt={product.name}
                 width={600}
                 height={600}
-                className="object-cover w-full rounded"
+                className="object-contain w-auto h-full"
               />
-            )}
+            </Zoom>
           </div>
 
-          <div className="grid grid-cols-4 gap-2">
+          {/* Thumbnail Gallery */}
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
             {product.images.map((img, i) => (
-              <img
+              <button
                 key={i}
-                src={img}
-                alt={`Thumb ${i}`}
-                width={100}
-                height={100}
-                className="rounded object-cover border hover:ring-2 hover:ring-black transition"
-              />
+                onClick={() => setMainImage(img)}
+                className={`rounded border ${
+                  mainImage === img ? 'ring-2 ring-black' : ''
+                } overflow-hidden`}
+              >
+                <img
+                  src={img}
+                  alt={`Thumbnail ${i}`}
+                  width={100}
+                  height={100}
+                  className="object-cover w-full h-20 sm:h-24"
+                />
+              </button>
             ))}
           </div>
         </div>
 
-        {/* Product Info */}
+        {/* Product Details */}
         <div className="w-full lg:w-1/2">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{product.name}</h1>
           <p className="mt-2 text-gray-600 text-sm sm:text-base">{product.description}</p>
@@ -89,9 +87,11 @@ export default function ProductDetailPage({slug}:{slug:string}) {
           </div>
 
           {/* Stock */}
-          <p className="mt-2 text-sm text-gray-500">
-            {/* {product.inStock > 0 ? `${product.inStock} pieces left` : 'Out of stock'} */}
-          </p>
+          {/* {product.inStock !== undefined && (
+            <p className="mt-2 text-sm text-gray-500">
+              {product.inStock > 0 ? `${product.inStock} pieces left` : 'Out of stock'}
+            </p>
+          )} */}
 
           {/* Add to Cart */}
           <button className="mt-6 w-full sm:w-auto bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition">
@@ -104,17 +104,15 @@ export default function ProductDetailPage({slug}:{slug:string}) {
 
       {/* Combo Offers */}
       <div className="mt-16">
-        <h2 className="text-xl sm:text-2xl font-bold mb-6 text-gray-800">
-          Combo Offers You’ll Love
-        </h2>
+        <h2 className="text-xl sm:text-2xl font-bold mb-6 text-gray-800">Combo Offers You’ll Love</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((combo) => (
+          {[1, 2, 3].map(combo => (
             <div
               key={combo}
               className="p-4 border rounded-lg shadow-sm hover:shadow-md transition bg-gray-50"
             >
               <div className="flex items-center justify-between gap-3 mb-4">
-                <Image
+                <img
                   src="/images/product_01/image_01.jpg"
                   alt="Combo Product"
                   width={80}
@@ -122,7 +120,7 @@ export default function ProductDetailPage({slug}:{slug:string}) {
                   className="rounded object-cover"
                 />
                 <span className="text-xl font-semibold">+</span>
-                <Image
+                <img
                   src="/images/shawl.jpg"
                   alt="Shawl"
                   width={80}
@@ -133,7 +131,10 @@ export default function ProductDetailPage({slug}:{slug:string}) {
               <h3 className="text-lg font-semibold text-gray-800">Hoodie + Shawl Combo</h3>
               <p className="text-sm text-gray-500 mt-1">Perfect match for chilly days</p>
               <div className="mt-2 text-red-600 font-bold text-lg">$79.99</div>
-              <Link href="/combo/hoodie-shawl" className="mt-3 inline-block text-sm text-blue-600 underline">
+              <Link
+                href="/combo/hoodie-shawl"
+                className="mt-3 inline-block text-sm text-blue-600 underline"
+              >
                 View Combo
               </Link>
             </div>
