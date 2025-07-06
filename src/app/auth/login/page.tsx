@@ -5,6 +5,8 @@ import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { apiServices } from '@/service/apiService'
 import toast from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import { setCredentials } from '@/store/slices/authSlice'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -12,6 +14,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+  const dispatch = useDispatch()
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -22,6 +25,8 @@ export default function LoginPage() {
       console.log(email,password,'auth data')
       const res = await apiServices().login({ email, password })
       if (res.status === 200) {
+        console.log(res,'response res')
+        dispatch(setCredentials(res?.data))
         toast.success('log in success')
         router.push('/') // Redirect to homepage or dashboard
       }

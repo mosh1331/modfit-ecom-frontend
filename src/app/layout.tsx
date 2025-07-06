@@ -7,9 +7,12 @@ import { store, RootState } from '@/store'
 import Link from 'next/link'
 import { ShoppingBagIcon } from 'lucide-react'
 import { Toaster } from 'react-hot-toast'
+import { useAuth } from '@/hooks/useAuth'
 
 function LayoutContent({ children }: { children: ReactNode }) {
-  const { user } = useSelector((state: RootState) => state.auth)
+  // const { user } = useSelector((state: RootState) => state.auth)
+  const { user } = useAuth()
+  console.log(user,'user layout')
   const isLoggedIn = !!user
 
   return (
