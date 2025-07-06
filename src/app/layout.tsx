@@ -23,7 +23,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
           <Link href='/' className='text-xl font-bold text-white'>
             Modtif
           </Link>
-          <div className='space-x-4'>
+          <div className='space-x-4 flex'>
             {!isLoggedIn ? (
               <Link href='/auth/login' className='text-blue-400 hover:underline'>
                 Login
@@ -33,6 +33,9 @@ function LayoutContent({ children }: { children: ReactNode }) {
                 <ShoppingBagIcon />
               </Link>
             )}
+            <Link href='/cart' className='text-blue-400 hover:underline'>
+                <ShoppingBagIcon />
+              </Link>
           </div>
         </header>
 
