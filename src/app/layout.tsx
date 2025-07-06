@@ -3,8 +3,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { ReactNode } from 'react'
-import { Provider } from 'react-redux'
-import { store } from '@/store'
+import { Provider, useSelector } from 'react-redux'
+import { RootState, store } from '@/store'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { ShoppingBagIcon } from 'lucide-react'
@@ -17,7 +17,10 @@ import { Toaster } from 'react-hot-toast'
 
 
 export default function RootLayout ({ children }: { children: ReactNode }) {
-  const { user, isLoggedIn } = useAuth()
+  const { isLoggedIn } = useAuth()
+  const {user} = useSelector((state:RootState) => state.auth)
+  console.log(user,'user auth details')
+  
 
   return (
     <html lang='en'>
