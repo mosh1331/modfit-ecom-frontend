@@ -1,7 +1,7 @@
 // LandingPage.jsx
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Mail, Star } from 'lucide-react';
+import { Mail, RefreshCcw, Star } from 'lucide-react';
 import { apiServices } from '@/service/apiService';
 import Loader from '../loader/Loader';
 import Link from 'next/link';
@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useDispatch, useSelector } from 'react-redux';
 import ModtifLoader from '../loader/ModtifLoader';
 import { fetchProducts } from '@/store/slices/productSlice';
+import CustomerReviews from '../reviews/CustomerReviews';
 
 
 const LandingPage = () => {
@@ -19,7 +20,7 @@ const LandingPage = () => {
     dispatch(fetchProducts())
   }, [dispatch])
 
-if(loading) return <ModtifLoader />
+  if (loading) return <ModtifLoader />
   return (
     <div className="font-sans bg-white text-gray-900 relative">
       {/* HERO */}
@@ -34,11 +35,16 @@ if(loading) return <ModtifLoader />
           {/* <ProductThreeSixty /> */}
         </div>
       </section>
+      {/* Review Discount Banner */}
+      <section className="bg-yellow-100 py-4 px-6 text-center text-sm text-gray-800 font-medium shadow-inner">
+        Share your experience after purchase and get <span className="font-bold">5% off</span> your next order! 💫
+      </section>
+
       {/* FEATURED PRODUCTS */}
       <section className="py-16 px-8">
-        <h2 className="text-3xl font-semibold mb-8 text-center">Featured Collection</h2>
+        <h2 className="text-3xl font-semibold mb-8 text-center">Latest Drops</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {products?.filter((i,index)=> index < 3).map((item) => (
+          {products?.filter((i, index) => index < 3).map((item) => (
             <div key={item.id} className="border p-4 rounded-xl hover:shadow-md transition">
               <img src={item?.images[0]} alt={`Product ${item.name}`} className="w-full h-64 object-cover rounded-md mb-4" />
               <h3 className="font-medium text-xl">{item.name}</h3>
@@ -66,7 +72,7 @@ if(loading) return <ModtifLoader />
             <p className="text-gray-600 mt-2">Crafted with care, our fabrics feel as good as they look.</p>
           </div>
           <div>
-            <img src="/images/360_icon.svg" alt="360 icon" className="mx-auto mb-4 h-8" />
+            <RefreshCcw className="mx-auto mb-4 text-grey-400" size={32}  />
             <h3 className="font-semibold text-lg">360° View</h3>
             <p className="text-gray-600 mt-2">See every detail before you buy. Confidence in every purchase.</p>
           </div>
@@ -77,7 +83,7 @@ if(loading) return <ModtifLoader />
           </div>
         </div>
       </section>
-
+      <CustomerReviews />
       {/* NEWSLETTER */}
       <section className="py-16 bg-gray-50 text-center px-8">
         <h2 className="text-2xl font-semibold mb-4">Stay Updated</h2>
