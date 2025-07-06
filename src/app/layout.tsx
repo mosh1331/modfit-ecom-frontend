@@ -7,6 +7,8 @@ import { Provider } from 'react-redux'
 import { store } from '@/store'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { ShoppingBagIcon } from 'lucide-react'
+import { Toaster } from 'react-hot-toast'
 
 // export const metadata: Metadata = {
 //   title: "Modfit | Modest Wears",
@@ -36,7 +38,7 @@ export default function RootLayout ({ children }: { children: ReactNode }) {
             ) : (
               <>
                 <Link href='/cart' className='text-blue-600 hover:underline'>
-                  Cart
+                  <ShoppingBagIcon />
                 </Link>
               </>
             )}
@@ -45,7 +47,7 @@ export default function RootLayout ({ children }: { children: ReactNode }) {
 
         {/* Main content */}
         <Provider store={store}>{children}</Provider>
-
+        <Toaster position="top-right" />
         {/* Footer */}
         <footer className='bg-black text-white w-full  text-center text-sm text-gray-600 py-4'>
           &copy; 2025 Modtif. All rights reserved.

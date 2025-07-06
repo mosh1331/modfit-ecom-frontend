@@ -4,6 +4,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { apiServices } from '@/service/apiService'
+import toast from 'react-hot-toast'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -21,9 +22,11 @@ export default function LoginPage() {
       console.log(email,password,'auth data')
       const res = await apiServices().login({ email, password })
       if (res.status === 200) {
+        toast.success('log in success')
         router.push('/') // Redirect to homepage or dashboard
       }
     } catch (err) {
+      toast(err.response?.data?.message || err?.message || 'Login failed')
       setError(err.response?.data?.message || 'Login failed')
     } finally {
       setLoading(false)
