@@ -5,24 +5,21 @@ import { Mail, Star } from 'lucide-react';
 import { apiServices } from '@/service/apiService';
 import Loader from '../loader/Loader';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
+import { useDispatch, useSelector } from 'react-redux';
+import ModtifLoader from '../loader/ModtifLoader';
+import { fetchProducts } from '@/store/slices/productSlice';
 
 
 const LandingPage = () => {
-  const [session_id, setSessionId] = useState("dummy_session_test");
-
-  const fetchData = async () => {
-    // const data = { name: 'test user 1', email: 'test@gmail.com', password: 'test123' }
-    const response = await apiServices().getProducts()
-    // const response = await axios.post('http://localhost:5001/api/auth/register', data)
-    console.log(response, 'response')
-
-  }
+  const dispatch = useDispatch()
+  const { items: products, loading, error } = useSelector((state) => state.products)
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    dispatch(fetchProducts())
+  }, [dispatch])
 
-
+if(loading) return <ModtifLoader />
   return (
     <div className="font-sans bg-white text-gray-900 relative">
       {/* HERO */}
@@ -30,23 +27,22 @@ const LandingPage = () => {
         <div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Elegant Modest Wear for Every Occasion</h1>
           <p className="mb-6 text-lg text-gray-700">Experience our 360° view to explore every detail of your perfect look.</p>
-          <Link href={`/products`}  className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Shop Collection</Link>
-          <Link href={`/admin/product-manage/create`}  className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Create Product</Link>
+          <Link href={`/products`} className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Shop Collection</Link>
+          <Link href={`/admin/product-manage/create`} className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Create Product</Link>
         </div>
         <div className="rounded-xl overflow-hidden shadow-lg w-1/2">
           {/* <ProductThreeSixty /> */}
         </div>
       </section>
-
       {/* FEATURED PRODUCTS */}
       <section className="py-16 px-8">
         <h2 className="text-3xl font-semibold mb-8 text-center">Featured Collection</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map((item) => (
-            <div key={item} className="border p-4 rounded-xl hover:shadow-md transition">
-              <img src={`/images/featured_${item}.jpg`} alt={`Product ${item}`} className="w-full h-64 object-cover rounded-md mb-4" />
-              <h3 className="font-medium text-xl">Modest Dress {item}</h3>
-              <p className="text-gray-600 mt-2">$49.99</p>
+          {products?.filter((i,index)=> index < 3).map((item) => (
+            <div key={item.id} className="border p-4 rounded-xl hover:shadow-md transition">
+              <img src={item?.images[0]} alt={`Product ${item.name}`} className="w-full h-64 object-cover rounded-md mb-4" />
+              <h3 className="font-medium text-xl">{item.name}</h3>
+              <p className="text-gray-600 mt-2">{item.discount}</p>
             </div>
           ))}
         </div>
@@ -95,12 +91,6 @@ const LandingPage = () => {
           <button className="bg-black text-white px-6 py-2 rounded-full">Subscribe</button>
         </div>
       </section>
-
-
-      {/* FOOTER */}
-      <footer className="bg-black text-white py-8 text-center">
-        <p>&copy; {new Date().getFullYear()} Your Brand Name. All rights reserved.</p>
-      </footer>
     </div>
   );
 }

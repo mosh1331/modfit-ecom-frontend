@@ -1,54 +1,51 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { apiServices } from '@/service/apiService';
-import Link from 'next/link';
-import ModtifLoader from '../loader/ModtifLoader';
+import { useEffect } from 'react'
+import Link from 'next/link'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/store'
+import { fetchProducts } from '@/store/slices/productSlice'
+import ModtifLoader from '../loader/ModtifLoader'
+import { apiServices } from '@/service/apiService'
 
 type Product = {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  discountedPrice?: number;
-  images: string[];
-  category: string;
-};
+  id: string
+  name: string
+  description: string
+  price: number
+  discountedPrice?: number
+  images: string[]
+  category: string
+}
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch<AppDispatch>()
 
-  const handleDelete =async(id:string)=>{
-    setLoading(true)
-    const response = await apiServices().deleteProductById(id)
-    console.log(response,'response delete')
-    fetchList()
-    setLoading(false)
-
-  }
-
-
-  const fetchList =() =>{
-    apiServices()
-    .getProducts()
-    .then((res: any) => {
-      if (res?.status === 200) {
-        setProducts(res.data);
-      }
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.error('Failed to fetch products:', err);
-      setLoading(false);
-    });
-  }
+  const { items:products, loading, error } = useSelector((state: RootState) => state.products)
 
   useEffect(() => {
-    fetchList()
-  }, []);
+    dispatch(fetchProducts())
+  }, [dispatch])
 
-  if (loading) return <ModtifLoader />;
+  const handleDelete = async (id: string) => {
+    try {
+      await apiServices().deleteProductById(id)
+      dispatch(fetchProducts())
+    } catch (err) {
+      console.error('Delete failed:', err)
+    }
+  }
+
+  const addToCart = async (id: string) => {
+    try {
+      await apiServices().addToCart({ productId: id, quantity: 1 })
+    } catch (err) {
+      console.error('Add to cart failed:', err)
+    }
+  }
+
+  if (loading) return <ModtifLoader />
+  if (error) return <p className="text-center text-red-600">{error}</p>
 
   return (
     <div className="bg-white min-h-screen py-10 px-4 sm:px-6 lg:px-12">
@@ -76,31 +73,29 @@ export default function ProductsPage() {
               </Link>
 
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900 truncate">
-                  {product.name}
-                </h3>
-                <p className="text-sm text-gray-500 truncate">
-                  {product.description}
-                </p>
-                <div className="mt-2 flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900 truncate">{product.name}</h3>
+                <p className="text-sm text-gray-500 truncate">{product.description}</p>
+                <div className="mt-2 flex items-center justify-between gap-2">
                   <div className="text-base font-medium text-gray-900">
                     {product.discountedPrice ? (
                       <>
-                        <span className="text-red-600 mr-2">
-                          ${product.discountedPrice}
-                        </span>
-                        <span className="line-through text-gray-400 text-sm">
-                          ${product.price}
-                        </span>
+                        <span className="text-red-600 mr-2">${product.discountedPrice}</span>
+                        <span className="line-through text-gray-400 text-sm">${product.price}</span>
                       </>
                     ) : (
                       <>${product.price}</>
                     )}
                   </div>
-                  <button className="bg-black text-white text-sm px-4 py-1.5 rounded hover:bg-gray-800 transition">
+                  <button
+                    onClick={() => addToCart(product.id)}
+                    className="bg-black text-white text-sm px-4 py-1.5 rounded hover:bg-gray-800 transition"
+                  >
                     Add to Cart
                   </button>
-                  <button onClick={()=>handleDelete(product?.id)} className="bg-black text-white text-sm px-4 py-1.5 rounded hover:bg-gray-800 transition">
+                  <button
+                    onClick={() => handleDelete(product.id)}
+                    className="bg-red-600 text-white text-sm px-4 py-1.5 rounded hover:bg-red-700 transition"
+                  >
                     Delete
                   </button>
                 </div>
@@ -112,5 +107,5 @@ export default function ProductsPage() {
         <p className="text-center text-gray-600">No products found.</p>
       )}
     </div>
-  );
+  )
 }

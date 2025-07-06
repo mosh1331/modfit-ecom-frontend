@@ -1,76 +1,46 @@
 // src/utils/api.ts
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
-import { store } from '@/store'
+import axios, { AxiosInstance } from 'axios'
 
-/** ────────────────────────────────────────────── */
-/** 1) Authenticated API (with interceptors + refresh) */
-/** ────────────────────────────────────────────── */
 const BASE_URL = process.env.NEXT_PUBLIC_API
+
+/**
+ * ──────────────────────────────────────────────
+ * 1) Authenticated API (sends credentials/cookies)
+ * ──────────────────────────────────────────────
+ */
 function createAuthAPI (): AxiosInstance {
   const instance = axios.create({
     baseURL: BASE_URL,
-    withCredentials: true, // send cookies if you use them
-    headers: { Accept: 'application/json' }
-  })
-
-  let isRefreshing = false
-  let refreshSubscribers: ((token: string) => void)[] = []
-
-  const subscribeTokenRefresh = (cb: (token: string) => void) => {
-    refreshSubscribers.push(cb)
-  }
-  const notifySubscribers = (newToken: string) => {
-    refreshSubscribers.forEach(cb => cb(newToken))
-    refreshSubscribers = []
-  }
-
-  // Attach access token to each request
-  //@ts-expect-error
-  instance.interceptors.request.use((config: AxiosRequestConfig) => {
-    const { auth } = store.getState()
-    if (auth.accessToken) {
-      if (config.headers) {
-        config.headers.Authorization = `Bearer ${auth.accessToken}`
-      }
+    withCredentials: true, // sends cookie (access + refresh)
+    headers: {
+      Accept: 'application/json',
     }
-    return config
   })
 
-  // Handle 401 + refresh flow
+  // Handle 401 errors and attempt silent refresh
   instance.interceptors.response.use(
     res => res,
     async err => {
       const originalReq = err.config
+
+      // Only retry once
       if (err.response?.status === 401 && !originalReq._retry) {
         originalReq._retry = true
-        if (!isRefreshing) {
-          isRefreshing = true
-          const { auth } = store.getState()
-          try {
-            const { data } = await axios.post(
-              `${BASE_URL}/auth/token-refresh`,
-              { refresh: auth.refreshToken },
-              { withCredentials: true }
-            )
-            // store.dispatch(
-            //   setAuthTokens({ access: data.access, refresh: data.refresh })
-            // )
-            notifySubscribers(data.access)
-          } catch (refreshErr) {
-            // store.dispatch(logoutAction())
-            return Promise.reject(refreshErr)
-          } finally {
-            isRefreshing = false
-          }
-        }
-        return new Promise((resolve, reject) => {
-          subscribeTokenRefresh(token => {
-            if (!originalReq.headers) return reject(err)
-            originalReq.headers.Authorization = `Bearer ${token}`
-            resolve(instance(originalReq))
+
+        try {
+          // Attempt refresh token (refresh cookie sent automatically)
+          await axios.post(`${BASE_URL}/api/auth/refresh-token`, null, {
+            withCredentials: true,
           })
-        })
+
+          // Retry the original request
+          return instance(originalReq)
+        } catch (refreshErr) {
+          // Optionally: redirect to login or clear app state
+          return Promise.reject(refreshErr)
+        }
       }
+
       return Promise.reject(err)
     }
   )
@@ -78,9 +48,11 @@ function createAuthAPI (): AxiosInstance {
   return instance
 }
 
-/** ────────────────────────────────────────────── */
-/** 2) Public API (no auth, no interceptors)        */
-/** ────────────────────────────────────────────── */
+/**
+ * ──────────────────────────────────────────────
+ * 2) Public API (no auth, no interceptors)
+ * ──────────────────────────────────────────────
+ */
 function createPublicAPI (): AxiosInstance {
   return axios.create({
     baseURL: BASE_URL,

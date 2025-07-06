@@ -1,11 +1,12 @@
 'use client'
 
-import type { Metadata } from "next";
-import "./globals.css";
-import { ReactNode } from 'react';
-import { Provider } from 'react-redux';
-import { store } from "@/store";
-
+import type { Metadata } from 'next'
+import './globals.css'
+import { ReactNode } from 'react'
+import { Provider } from 'react-redux'
+import { store } from '@/store'
+import Link from 'next/link'
+import { useAuth } from '@/hooks/useAuth'
 
 // export const metadata: Metadata = {
 //   title: "Modfit | Modest Wears",
@@ -13,16 +14,43 @@ import { store } from "@/store";
 // };
 
 
+export default function RootLayout ({ children }: { children: ReactNode }) {
+  const { user, isLoggedIn } = useAuth()
 
-export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html>
-      <body>
-        <Provider store={store}>
-          {children}
-        </Provider>
+    <html lang='en'>
+      <body className='min-h-screen flex flex-col'>
+        {/* Header */}
+        <header className='w-full bg-black shadow p-4 flex justify-between items-center'>
+          <Link href='/' className='text-xl font-bold'>
+            Modtif
+          </Link>
+          <div className='space-x-4'>
+            {!isLoggedIn ? (
+              <Link
+                href='/auth/login'
+                className='text-blue-600 hover:underline'
+              >
+                Login
+              </Link>
+            ) : (
+              <>
+                <Link href='/cart' className='text-blue-600 hover:underline'>
+                  Cart
+                </Link>
+              </>
+            )}
+          </div>
+        </header>
+
+        {/* Main content */}
+        <Provider store={store}>{children}</Provider>
+
+        {/* Footer */}
+        <footer className='bg-black text-white w-full  text-center text-sm text-gray-600 py-4'>
+          &copy; 2025 Modtif. All rights reserved.
+        </footer>
       </body>
     </html>
-  );
+  )
 }
-
