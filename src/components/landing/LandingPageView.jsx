@@ -24,12 +24,12 @@ const LandingPage = () => {
   return (
     <div className="font-sans bg-white text-gray-900 relative">
       {/* HERO */}
-      <section className="min-h-screen grid grid-cols-1 md:grid-cols-2 items-center p-8 md:p-20 gap-8 bg-gray-50">
+      <section className="min-h-[88vh] grid grid-cols-1 md:grid-cols-2 items-center p-8 md:p-20 gap-8 bg-gray-50">
         <div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Elegant Modest Wear for Every Occasion</h1>
           <p className="mb-6 text-lg text-gray-700">Experience our 360° view to explore every detail of your perfect look.</p>
           <Link href={`/products`} className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Shop Collection</Link>
-          <Link href={`/admin/product-manage/create`} className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Create Product</Link>
+          {/* <Link href={`/admin/product-manage/create`} className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Create Product</Link> */}
         </div>
         <div className="rounded-xl overflow-hidden shadow-lg w-1/2">
           {/* <ProductThreeSixty /> */}
