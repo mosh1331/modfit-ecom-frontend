@@ -4,48 +4,34 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { apiServices } from '@/service/apiService'
 import { useAuth } from '@/hooks/useAuth'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/store'
+import {
+  fetchCart,
+  removeCartItem,
+  updateCartItemQty
+} from '@/store/slices/cartSlice'
 
-type CartItem = {
-  productId: string
-  name: string
-  price: number
-  quantity: number
-  image: string
-  discountedPrice?: number
-}
 
 
 export default function CartPage () {
-  const [cart, setCart] = useState<CartItem[]>([])
   const { user, isLoggedIn } = useAuth()
 
-  console.log(user,'userr',isLoggedIn)
+  const dispatch = useDispatch<AppDispatch>()
+  const { items: cart, loading } = useSelector((state: RootState) => state.cart)
 
-  const [loading, setLoading] = useState(true)
+  console.log(cart,'cart items')
 
-
-  const fetchCartData = async () => {
-    const response = await apiServices().getCart()
-    console.log(response, 'response cart ')
-    setCart(response?.data)
-    setLoading(false)
-  }
   useEffect(() => {
-    fetchCartData()
-  }, [])
+    dispatch(fetchCart())
+  }, [dispatch])
 
-  const updateQty = (id: string, qty: number) => {
-    setCart(prev =>
-      prev.map(item =>
-        item.productId === id ? { ...item, quantity: qty } : item
-      )
-    )
-    // apiServices().updateCartItem({productId:id,qty});
+  const updateQty = (productId: string, qty: number) => {
+    dispatch(updateCartItemQty({ productId, quantity: qty }))
   }
 
-  const removeItem = (id: string) => {
-    setCart(prev => prev.filter(x => x.productId !== id))
-    apiServices().removeFromCart({productId:id});
+  const removeItem = (productId: string) => {
+    dispatch(removeCartItem(productId))
   }
 
   const subtotal = cart.reduce(
@@ -76,8 +62,8 @@ export default function CartPage () {
                 className='flex items-center gap-4 bg-white shadow p-4 rounded'
               >
                 <img
-                  src={item.image}
-                  alt={item.name}
+                  src={item?.image}
+                  alt={item?.name}
                   width={80}
                   height={80}
                   className='rounded'

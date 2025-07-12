@@ -5,6 +5,8 @@ import { User, MapPin, Star, Gift, ShoppingBag, LogOut, PersonStanding } from 'l
 
 export default function ProfilePage() {
     const {user,loading} = useAuth()
+
+    console.log(user,'user')
     if(loading) return <ModtifLoader />
   return (
     <div className="p-6 text-black md:p-12 max-w-6xl mx-auto">
@@ -21,7 +23,7 @@ export default function ProfilePage() {
           <PersonStanding />
           <div>
             <h2 className="text-xl font-semibold">Hi, {user?.name}</h2>
-            <p className="text-gray-500 text-sm">fatima@example.com</p>
+            <p className="text-gray-500 text-sm">{user?.email}</p>
           </div>
         </div>
         <div className="text-sm bg-gray-100 rounded-lg px-4 py-2 text-gray-600 flex items-center gap-2">

@@ -24,10 +24,10 @@ const LandingPage = () => {
   return (
     <div className="font-sans bg-white text-gray-900 relative">
       {/* HERO */}
-      <section className="min-h-[88vh] grid grid-cols-1 md:grid-cols-2 items-center p-8 md:p-20 gap-8 bg-gray-50">
+      <section className="min-h-[88vh] grid grid-cols-1 md:grid-cols-2 items-center p-8 md:p-20 gap-8 !bg-[#85765e]">
         <div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Elegant Modest Wear for Every Occasion</h1>
-          <p className="mb-6 text-lg text-gray-700">Experience our 360° view to explore every detail of your perfect look.</p>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">Elegant Modest Wear for Every Occasion</h1>
+          <p className="mb-6 text-lg text-gray-200">Experience our 360° view to explore every detail of your perfect look.</p>
           <Link href={`/products`} className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Shop Collection</Link>
           {/* <Link href={`/admin/product-manage/create`} className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Create Product</Link> */}
         </div>
@@ -36,7 +36,7 @@ const LandingPage = () => {
         </div>
       </section>
       {/* Review Discount Banner */}
-      <section className="bg-yellow-100 py-4 px-6 text-center text-sm text-gray-800 font-medium shadow-inner">
+      <section className="bg-amber-200 py-4 px-6 text-center text-sm text-gray-800 font-medium shadow-inner">
         Share your experience after purchase and get <span className="font-bold">5% off</span> your next order! 💫
       </section>
 

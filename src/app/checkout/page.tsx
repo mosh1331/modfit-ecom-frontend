@@ -1,69 +1,149 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { apiServices } from '@/service/apiService';
-import Script from 'next/script';
+'use client'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import axios from 'axios'
+import { loadRazorpay } from '@/utils/helper'
+import { RootState } from '@/store'
+import { fetchCart } from '@/store/slices/cartSlice'
+import { useAuth } from '@/hooks/useAuth'
 
-export default function CheckoutPage() {
-  const [orderId, setOrderId] = useState<string>('');
-  const [amount, setAmount] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
+export default function CheckoutPage () {
+  const dispatch = useDispatch()
+  const { user } = useAuth()
+
+  // const { user } = useSelector((state: RootState) => state.auth)
+  const { items: cartItems, loading } = useSelector(
+    (state: RootState) => state.cart
+  )
+
+  const [address, setAddress] = useState('')
 
   useEffect(() => {
-    // apiServices().createRazorpayOrder()
-    //   .then(res => {
-    //     setOrderId(res.data.razorpayOrderId);
-    //     setAmount(res.data.amount);
-    //   })
-    //   .finally(() => setLoading(false));
-  }, []);
+    //@ts-ignore
+    dispatch(fetchCart())
+  }, [dispatch])
 
-  const handlePayment = () => {
-    if (!orderId) return;
+  const totalAmount = cartItems.reduce(
+    (sum, item) => sum + (item.discountedPrice ?? item.price) * item.quantity,
+    0
+  )
 
-    const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY!,
-      amount: amount.toString(),
-      currency: 'INR',
-      name: 'Modtif',
-      description: 'Purchase Items',
-      order_id: orderId,
-      handler: async function (response: any) {
-        // await apiServices().verifyPayment({
-        //   orderId: options.order_id,
-        //   paymentId: response.razorpay_payment_id,
-        //   signature: response.razorpay_signature,
-        // });
-        window.location.href = '/order/success';
-      },
-      prefill: {
-        name: '',
-        email: '',
-        contact: '',
-      },
-      theme: {
-        color: '#000',
-      },
-    };
-    const rp = new (window as any).Razorpay(options);
-    rp.open();
-  };
+  console.log(user, 'user')
 
-  if (loading) return <p className="text-center py-10">Preparing payment …</p>;
+  const handlePayment = async () => {
+    const BASE_URL = process.env.NEXT_PUBLIC_API
+
+    if (!address) return alert('Please enter a shipping address.')
+
+    const res = await loadRazorpay()
+    if (!res) return alert('Failed to load Razorpay.')
+
+    try {
+      const orderRes = await axios.post(`${BASE_URL}/api/orders/create`, {
+        userId: user.id,
+        amount: totalAmount,
+        address,
+        items: cartItems.map(item => ({
+          productId: item.productId,
+          quantity: item.quantity
+        }))
+      },{
+        withCredentials: true,
+        headers: { Accept: 'application/json' }
+      })
+
+      const { razorpayOrderId, orderId } = orderRes.data
+      const options: any = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: totalAmount * 100,
+        currency: 'INR',
+        name: 'Modtif Store',
+        description: 'Order Payment',
+        order_id: razorpayOrderId,
+        handler: async (response: any) => {
+          const verifyRes = await axios.post(`${BASE_URL}/api/orders/verify`, {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            orderId
+          },{
+            withCredentials: true,
+            headers: { Accept: 'application/json' }
+          })
+
+          if (verifyRes.data.success) {
+            alert('Payment successful! Order placed.')
+          } else {
+            alert('Payment verification failed.')
+          }
+        },
+        prefill: {
+          name: user.name,
+          email: user.email
+        },
+        theme: { color: '#000' }
+      }
+
+      const rzp = new (window as any).Razorpay(options)
+      rzp.open()
+    } catch (err) {
+      console.error('Error initiating payment:', err)
+      alert('Something went wrong. Please try again.')
+    }
+  }
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-6">Checkout</h1>
-      <div className="max-w-md mx-auto bg-gray-50 p-6 rounded shadow">
-        <p className="mb-4">Amount to pay:</p>
-        <div className="text-2xl font-semibold">${(amount / 100).toFixed(2)}</div>
-        <button
-          onClick={handlePayment}
-          className="mt-6 w-full bg-black text-white py-2 rounded hover:bg-gray-800"
-        >
-          Pay with Razorpay
-        </button>
-      </div>
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" />
+    <div className='max-w-4xl mx-auto p-6'>
+      <h1 className='text-2xl font-bold mb-6'>Checkout</h1>
+
+      {loading ? (
+        <p>Loading cart...</p>
+      ) : cartItems.length === 0 ? (
+        <p>Your cart is empty.</p>
+      ) : (
+        <>
+          {/* Cart Summary */}
+          <div className='mb-6 text-black'>
+            <h2 className='text-lg font-semibold mb-2'>Items</h2>
+            {cartItems.map(item => (
+              <div
+                key={item.productId}
+                className='flex justify-between border-b py-2'
+              >
+                <div>
+                  <p className='font-medium'>{item.name}</p>
+                  <p className='text-sm text-gray-500'>Qty: {item.quantity}</p>
+                </div>
+                <p>₹{(item.discountedPrice ?? item.price) * item.quantity}</p>
+              </div>
+            ))}
+            <div className='flex justify-between font-semibold mt-4'>
+              <span>Total</span>
+              <span>₹{totalAmount}</span>
+            </div>
+          </div>
+
+          {/* Address */}
+          <div className='mb-6 text-black'>
+            <h2 className='text-lg font-semibold mb-2'>Shipping Address</h2>
+            <textarea
+              value={address}
+              onChange={e => setAddress(e.target.value)}
+              placeholder='Enter full shipping address'
+              className='w-full p-3 border rounded resize-none'
+              rows={3}
+            />
+          </div>
+
+          {/* Payment Button */}
+          <button
+            onClick={handlePayment}
+            className='bg-black text-white px-6 py-3 rounded hover:bg-gray-800 w-full'
+          >
+            Pay Now with Razorpay
+          </button>
+        </>
+      )}
     </div>
-  );
+  )
 }
