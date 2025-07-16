@@ -15,6 +15,15 @@ export const apiServices = () => {
         data
       })
     },
+    logout: () => {
+      return authAPI({
+        method: 'POST',
+        url: '/api/auth/logout',
+        headers: {
+         'Content-Type': 'application/json',
+        },
+      })
+    },
     signUp: (data: any) => {
       return publicAPI({
         method: 'POST',
@@ -111,6 +120,45 @@ export const apiServices = () => {
         }
       })
     },
+    getSavedAddresses : ()=>{
+      return authAPI({
+        method: 'GET',
+        url: `/api/addresses/`,
+        headers: {
+          'Content-Type':  'application/json',
+        }
+      })
+    },
+    addAddress : (data:any)=>{
+      return authAPI({
+        method: 'POST',
+        url: `/api/addresses/`,
+        headers: {
+          'Content-Type':  'application/json',
+        },
+        data
+      })
+    },
+    deleteAddress : (id:any)=>{
+      return authAPI({
+        method: 'DELETE',
+        url: `/api/addresses/${id}`,
+        headers: {
+          'Content-Type':  'application/json',
+        },
+      })
+    },
+    setDefaultAddress : (id:any)=>{
+      return authAPI({
+        method: 'PATCH',
+        url: `/api/addresses/${id}/default`,
+        headers: {
+          'Content-Type':  'application/json',
+        },
+      })
+    },
+
     
+  
   }
 }

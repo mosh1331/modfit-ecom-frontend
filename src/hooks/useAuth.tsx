@@ -1,22 +1,14 @@
 // hooks/useAuth.ts
 import { authAPI } from '@/api/apiRequest'
 import { apiServices } from '@/service/apiService'
+import { RootState } from '@/store'
 import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 export function useAuth() {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const { user} = useSelector((state: RootState) => state.auth)
+  
+ 
 
-  useEffect(() => {
-    apiServices().getProfile()
-      .then(res => {
-        setUser(res.data)
-      })
-      .catch(() => {
-        setUser(null)
-      })
-      .finally(() => setLoading(false))
-  }, [])
-
-  return { user, loading, isLoggedIn: !!user }
+  return { user,isLoggedIn: !!user }
 }

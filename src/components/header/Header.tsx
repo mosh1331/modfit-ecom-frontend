@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ChevronDownIcon, ShoppingBagIcon, UserIcon } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { useDispatch } from 'react-redux'
+import { logoutAction } from '@/store/slices/authSlice'
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const { user } = useAuth()
-  const isLoggedIn = !!user
+  const { user ,isLoggedIn} = useAuth()
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const dispatch = useDispatch()
 
   const toggleMenu = () => setMenuOpen((prev) => !prev)
 
@@ -72,7 +74,8 @@ export default function Header() {
                 </Link>
                 <button
                   onClick={() => {
-                    // 🔐 trigger logout logic here
+                    //@ts-ignore
+                    dispatch(logoutAction())
                   }}
                   className='block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500'
                 >
