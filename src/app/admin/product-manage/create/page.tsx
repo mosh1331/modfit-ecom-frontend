@@ -1,4 +1,4 @@
-import CreateProduct from '@/components/upload360Images/CreateProductForm'
+import CreateProduct from '@/components/products/CreateProductDraft'
 import React from 'react'
 
 const page = () => {

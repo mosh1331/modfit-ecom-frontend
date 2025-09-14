@@ -5,6 +5,7 @@ import storage from 'redux-persist/lib/storage' // defaults to localStorage
 import authReducer from './slices/authSlice'
 import productReducer from './slices/productSlice'
 import cartReducer from './slices/cartSlice'
+import partnerReducer from './slices/partnerSlice'
 
 // Configure persist for auth
 const authPersistConfig = {
@@ -17,7 +18,8 @@ const authPersistConfig = {
 const rootReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer), // only persist auth
   products: productReducer,
-  cart: cartReducer
+  cart: cartReducer,
+  partner:partnerReducer
 })
 
 export const store = configureStore({

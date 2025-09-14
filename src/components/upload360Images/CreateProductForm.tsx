@@ -8,16 +8,26 @@ import { useRouter } from 'next/navigation'
 
 interface ProductFormData {
   name: string
-  folder_name:string
+  folder_name: string
   description: string
   category: string
-  price: string // keeping as string for input
+  price: string
   discountedPrice: string
   sizes: string[]
   colors: string[]
   images: File[]
   image360: File[]
   inStock: boolean
+
+  // extra costing fields
+  stitching: string
+  delivery: string
+  rawMaterial: string
+  lining: string
+  overcoat: string
+  abaya: string
+  supervisorSalary: string
+  extra: string
 }
 
 export default function CreateProduct() {
@@ -32,7 +42,16 @@ export default function CreateProduct() {
     images: [],
     image360: [],
     inStock: true,
-    folder_name:''
+    folder_name: '',
+
+    stitching: '',
+    delivery: '',
+    rawMaterial: '',
+    lining: '',
+    overcoat: '',
+    abaya: '',
+    supervisorSalary: '',
+    extra: ''
   })
 
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
@@ -40,11 +59,21 @@ export default function CreateProduct() {
   const [loading, setLoading] = useState<boolean>(false)
 
   const BASE_URL = process.env.NEXT_PUBLIC_API
-  const router = useRouter();
+  const router = useRouter()
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: value }))
+    setForm(prev => {
+      const updated = { ...prev, [name]: value }
+
+      // 🔹 Auto-calc Raw Material = Lining + Overcoat + Abaya
+      const lining = parseFloat(updated.lining || '0')
+      const overcoat = parseFloat(updated.overcoat || '0')
+      const abaya = parseFloat(updated.abaya || '0')
+
+      updated.rawMaterial = String(lining + overcoat + abaya)
+      return updated
+    })
   }
 
   const handleArrayInput = (
@@ -71,12 +100,28 @@ export default function CreateProduct() {
     }
   }
 
+  const calculateTotalCost = () => {
+    const { stitching, delivery, rawMaterial, supervisorSalary, extra } = form
+    return (
+      (parseFloat(stitching) || 0) +
+      (parseFloat(delivery) || 0) +
+      (parseFloat(rawMaterial) || 0) +
+      (parseFloat(supervisorSalary) || 0) +
+      (parseFloat(extra) || 0)
+    )
+  }
+
+  const profit = () => {
+    const sellingPrice = parseFloat(form.price) || 0
+    const cost = calculateTotalCost()
+    return sellingPrice - cost
+  }
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      // 1. Upload regular images
       const imageForm = new FormData()
       form.images.forEach(file => imageForm.append('images', file))
 
@@ -88,10 +133,8 @@ export default function CreateProduct() {
           withCredentials: true
         }
       )
-
       const imageUrls: string[] = regUploadRes.data.urls
 
-      // 2. Upload 360 images
       const image360Form = new FormData()
       form.image360.forEach(file => image360Form.append('images', file))
 
@@ -103,30 +146,25 @@ export default function CreateProduct() {
           withCredentials: true
         }
       )
-
       const image360Urls: string[] = upload360Res.data.urls
-
-      // 3. Create the product
       await axios.post(
         `${BASE_URL}/api/products`,
         {
-          name: form.name,
-          description: form.description,
-          category: form.category,
+          ...form,
+
           price: parseFloat(form.price),
           discountedPrice: parseFloat(form.discountedPrice) || undefined,
-          sizes: form.sizes,
-          colors: form.colors,
+          cost: calculateTotalCost(),
+          profit: profit(),
           images: imageUrls,
-          image360: image360Urls,
-          inStock: form.inStock
+          image360: image360Urls
         },
         { withCredentials: true }
       )
+
       setLoading(false)
       alert('Product created successfully!')
-
-    router.push('/products');
+      router.push('/products')
     } catch (err) {
       console.error(err)
       setLoading(false)
@@ -139,10 +177,13 @@ export default function CreateProduct() {
   return (
     <form
       onSubmit={handleSubmit}
-      className='text-black max-w-2xl mx-auto p-6 bg-white rounded shadow space-y-6'
+      className='max-w-full mx-auto p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-md space-y-6'
     >
-      <h2 className='text-2xl font-semibold text-center'>Create Product</h2>
+      <h2 className='text-2xl font-bold text-center text-gray-800 dark:text-gray-100'>
+        Create Pardha
+      </h2>
 
+      {/* General fields */}
       {[
         { label: 'Name', name: 'name' },
         { label: 'Folder', name: 'folder_name' },
@@ -152,40 +193,88 @@ export default function CreateProduct() {
         { label: 'Discounted Price', name: 'discountedPrice', type: 'number' }
       ].map(({ label, name, type = 'text' }) => (
         <div key={name}>
-          <label className='block text-gray-700'>{label}</label>
+          <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+            {label}
+          </label>
           <input
             type={type}
             name={name}
-            value={form[name]}
+            value={form[name as keyof ProductFormData] as string}
             onChange={handleInputChange}
             required={['name', 'description', 'category', 'price'].includes(
               name
             )}
-            className='w-full mt-1 p-2 border border-gray-300 rounded'
+            className='w-full mt-1 p-3 border rounded-xl border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
           />
         </div>
       ))}
 
+      {/* Costing fields */}
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        {[
+          { label: 'Stitching', name: 'stitching' },
+          { label: 'Delivery / Packaging', name: 'delivery' },
+          { label: 'Raw Material', name: 'rawMaterial', disabled: true },
+          { label: 'Lining', name: 'lining' },
+          { label: 'Overcoat', name: 'overcoat' },
+          { label: 'Abaya', name: 'abaya' },
+          { label: 'Supervisor Salary', name: 'supervisorSalary' },
+          { label: 'Extra Cost', name: 'extra' }
+        ].map(({ label, name, disabled = false }) => (
+          <div key={name}>
+            <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+              {label}
+            </label>
+            <input
+              type='number'
+              name={name}
+              disabled={disabled}
+              value={form[name as keyof ProductFormData] as string}
+              onChange={handleInputChange}
+              className='w-full mt-1 p-3 border rounded-xl border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Auto-calculated */}
+      <div className='p-4 rounded-xl bg-blue-50 dark:bg-gray-800 border border-blue-200 dark:border-gray-700'>
+        <p className='text-sm text-gray-700 dark:text-gray-300'>
+          <strong>Total Cost:</strong> ₹{calculateTotalCost()}
+        </p>
+        <p className='text-sm text-gray-700 dark:text-gray-300'>
+          <strong>Expected Profit:</strong> ₹{profit()}
+        </p>
+      </div>
+
+      {/* Sizes & Colors */}
       <div>
-        <label className='block text-gray-700'>Sizes (comma separated)</label>
+        <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+          Sizes (comma separated)
+        </label>
         <input
           type='text'
           onChange={e => handleArrayInput(e, 'sizes')}
-          className='w-full mt-1 p-2 border border-gray-300 rounded'
+          className='w-full mt-1 p-3 border rounded-xl border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
         />
       </div>
 
       <div>
-        <label className='block text-gray-700'>Colors (comma separated)</label>
+        <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+          Colors (comma separated)
+        </label>
         <input
           type='text'
           onChange={e => handleArrayInput(e, 'colors')}
-          className='w-full mt-1 p-2 border border-gray-300 rounded'
+          className='w-full mt-1 p-3 border rounded-xl border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
         />
       </div>
 
+      {/* Images */}
       <div>
-        <label className='block text-gray-700'>Regular Images</label>
+        <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+          Regular Images
+        </label>
         <input
           type='file'
           multiple
@@ -197,14 +286,16 @@ export default function CreateProduct() {
               key={i}
               src={src}
               alt=''
-              className='w-20 h-20 object-cover rounded'
+              className='w-20 h-20 object-cover rounded-lg border'
             />
           ))}
         </div>
       </div>
 
       <div>
-        <label className='block text-gray-700'>360 Images</label>
+        <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+          360 Images
+        </label>
         <input
           type='file'
           multiple
@@ -216,12 +307,13 @@ export default function CreateProduct() {
               key={i}
               src={src}
               alt=''
-              className='w-20 h-20 object-cover rounded'
+              className='w-20 h-20 object-cover rounded-lg border'
             />
           ))}
         </div>
       </div>
 
+      {/* Stock toggle */}
       <div className='flex items-center'>
         <input
           type='checkbox'
@@ -231,14 +323,17 @@ export default function CreateProduct() {
           }
           className='mr-2'
         />
-        <label>In Stock</label>
+        <label className='text-sm text-gray-700 dark:text-gray-300'>
+          In Stock
+        </label>
       </div>
 
+      {/* Submit */}
       <button
         type='submit'
-        className='w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition'
+        className='w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-medium transition'
       >
-        Create Product
+        Create Pardha
       </button>
     </form>
   )

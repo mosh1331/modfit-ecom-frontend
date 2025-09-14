@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ModtifLoader from '../loader/ModtifLoader';
 import { fetchProducts } from '@/store/slices/productSlice';
 import CustomerReviews from '../reviews/CustomerReviews';
+import Hero from './Hero';
 
 
 const LandingPage = () => {
@@ -20,21 +21,22 @@ const LandingPage = () => {
     dispatch(fetchProducts())
   }, [dispatch])
 
+  const productImage =products?.[0]?.images?.[0]
+
   if (loading) return <ModtifLoader />
   return (
     <div className="font-sans bg-white text-gray-900 relative">
       {/* HERO */}
-      <section className="min-h-[88vh] grid grid-cols-1 md:grid-cols-2 items-center p-8 md:p-20 gap-8 !bg-[#85765e]">
+      {/* <section className="min-h-[88vh] grid grid-cols-1 md:grid-cols-2 items-center p-8 md:p-20 gap-8 !bg-[#85765e]">
         <div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">Elegant Modest Wear for Every Occasion</h1>
           <p className="mb-6 text-lg text-gray-200">Experience our 360° view to explore every detail of your perfect look.</p>
           <Link href={`/products`} className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Shop Collection</Link>
-          {/* <Link href={`/admin/product-manage/create`} className="bg-black text-white px-6 py-3 rounded-full text-lg hover:bg-gray-800">Create Product</Link> */}
         </div>
         <div className="rounded-xl overflow-hidden shadow-lg w-1/2">
-          {/* <ProductThreeSixty /> */}
         </div>
-      </section>
+      </section> */}
+      <Hero  productImage={productImage}/>
       {/* Review Discount Banner */}
       <section className="bg-amber-200 py-4 px-6 text-center text-sm text-gray-800 font-medium shadow-inner">
         Share your experience after purchase and get <span className="font-bold">5% off</span> your next order! 💫
