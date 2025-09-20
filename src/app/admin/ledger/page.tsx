@@ -110,7 +110,7 @@ export default function LedgerPage () {
             <span className='text-blue-600 font-semibold'>
               ₹
               {ledger
-                .filter(e => e.type.toLowerCase() === 'SALE')
+                .filter(e => e.type.toLowerCase() === 'income')
                 .reduce((sum, e) => sum + e.amount, 0)
                 .toLocaleString()}
             </span>
@@ -146,7 +146,7 @@ export default function LedgerPage () {
             <span
               className={`font-bold ${
                 ledger
-                  .filter(e => e.type.toLowerCase() === 'SALE')
+                  .filter(e => e.type.toLowerCase() === 'income' )
                   .reduce((sum, e) => sum + e.amount, 0) -
                   ledger
                     .filter(e => e.type.toLowerCase() === 'expense')
@@ -159,7 +159,7 @@ export default function LedgerPage () {
               ₹
               {(
                 ledger
-                  .filter(e => e.type.toLowerCase() === 'SALE')
+                  .filter(e => e.type.toLowerCase() === 'income')
                   .reduce((sum, e) => sum + e.amount, 0) -
                 ledger
                   .filter(e => e.type.toLowerCase() === 'expense')

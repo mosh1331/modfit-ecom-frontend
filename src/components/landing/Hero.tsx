@@ -29,7 +29,7 @@ const Hero = ({productImage}) => {
           transition={{ delay: 0.5 }}
           className="absolute bottom-4 left-4 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full shadow text-xs sm:text-sm font-medium"
         >
-          Free Shipping Over $50
+          Free Shipping All Over Kerala.
         </motion.div>
       </motion.div>
 

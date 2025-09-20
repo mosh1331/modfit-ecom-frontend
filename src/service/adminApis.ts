@@ -1,5 +1,9 @@
 import { authAPI } from '@/api/apiRequest'
-import { MaterialPayload, MaterialPurchasePayload, ProductExpensePayload } from '@/type/productType'
+import {
+  MaterialPayload,
+  MaterialPurchasePayload,
+  ProductExpensePayload
+} from '@/type/productType'
 
 export const adminAPis = () => {
   return {
@@ -145,10 +149,7 @@ export const adminAPis = () => {
         data
       })
     },
-    updateProductImages: (
-      id: Number | String,
-      data: ProductExpensePayload
-    ) => {
+    updateProductImages: (id: Number | String, data: ProductExpensePayload) => {
       return authAPI({
         method: 'POST',
         url: `/api/products/update-images/${id}`,
@@ -167,5 +168,24 @@ export const adminAPis = () => {
         }
       })
     },
+    addManualSale: (data: ProductExpensePayload) => {
+      return authAPI({
+        method: 'POST',
+        url: `/api/sale/`,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data
+      })
+    },
+    getSales: () => {
+      return authAPI({
+        method: 'GET',
+        url: `/api/sale`,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    }
   }
 }
