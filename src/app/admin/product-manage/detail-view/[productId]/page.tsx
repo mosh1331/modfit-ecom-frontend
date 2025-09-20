@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import { adminAPis } from "@/service/adminApis"
-import { Material } from "@/type/productType"
+import { PageProps } from "../../../../../../.next/types/app/page"
 
 interface Expense {
   id: number
@@ -10,7 +10,7 @@ interface Expense {
   unitPrice: number
   totalPrice: number
   note?: string
-  material: Material
+  material: any
 }
 
 interface Product {
@@ -29,7 +29,8 @@ interface Product {
   expenses: Expense[]
 }
 
-export default function ProductDetailView({ params }: { params: { productId: number } }) {
+export default function ProductDetailView({ params }: PageProps) {
+  //@ts-ignore
   const { productId } = params
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)

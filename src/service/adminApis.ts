@@ -1,8 +1,7 @@
 import { authAPI } from '@/api/apiRequest'
 import {
   MaterialPayload,
-  MaterialPurchasePayload,
-  ProductExpensePayload
+  MaterialPurchasePayload
 } from '@/type/productType'
 
 export const adminAPis = () => {
@@ -85,7 +84,7 @@ export const adminAPis = () => {
         }
       })
     },
-    getPartnerInvestmentsById: (partnerId: number) => {
+    getPartnerInvestmentsById: (partnerId: number|string) => {
       return authAPI({
         method: 'GET',
         url: `/api/partner/${partnerId}`,
@@ -138,7 +137,7 @@ export const adminAPis = () => {
 
     updateProductExpense: (
       id: Number | String,
-      data: ProductExpensePayload
+      data: any
     ) => {
       return authAPI({
         method: 'POST',
@@ -149,7 +148,7 @@ export const adminAPis = () => {
         data
       })
     },
-    updateProductImages: (id: Number | String, data: ProductExpensePayload) => {
+    updateProductImages: (id: Number | String, data: any) => {
       return authAPI({
         method: 'POST',
         url: `/api/products/update-images/${id}`,
@@ -168,7 +167,7 @@ export const adminAPis = () => {
         }
       })
     },
-    addManualSale: (data: ProductExpensePayload) => {
+    addManualSale: (data: any) => {
       return authAPI({
         method: 'POST',
         url: `/api/sale/`,

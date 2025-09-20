@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { adminAPis } from '@/service/adminApis'
-import { Material } from '@/type/productType'
+import { PageProps } from '../../../../../../.next/types/app/page'
 
 interface Product {
   id: number
@@ -19,12 +19,10 @@ interface Expense {
   unitPrice: number
   totalPrice: number
   note?: string
-  material: Material
+  material: any
 }
 
-interface Props {
-  params: { productId: number }
-}
+
 
 interface MaterialEntry {
   materialId: number | ''
@@ -34,9 +32,9 @@ interface MaterialEntry {
   note?: string
 }
 
-export default function AddProductExpenseView({ params }: Props) {
+export default function AddProductExpenseView({ params }: PageProps) {
   const [product, setProduct] = useState<Product | null>(null)
-  const [materials, setMaterials] = useState<Material[]>([])
+  const [materials, setMaterials] = useState<any[]>([])
   const [entries, setEntries] = useState<MaterialEntry[]>([
     { materialId: '', quantity: 0, unitPrice: 0, unit: '' }
   ])
@@ -44,6 +42,7 @@ export default function AddProductExpenseView({ params }: Props) {
   const [discountedPrice, setDiscountedPrice] = useState<number | ''>('')
   const [loading, setLoading] = useState(true)
 
+  //@ts-ignore
   const { productId } = params
 
   // --- Fetch product detail

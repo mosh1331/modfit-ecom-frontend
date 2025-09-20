@@ -1,8 +1,10 @@
 "use client"
 import { useState } from "react"
 import { adminAPis } from "@/service/adminApis"
+import { PageProps } from "../../../../../../.next/types/app/page"
 
-export default function ProductImageUpload({ params }: { params: { productId: number } }) {
+export default function ProductImageUpload({ params }:  PageProps) {
+  //@ts-ignore
   const { productId } = params
   const [images, setImages] = useState<File[]>([])
   const [images360, setImages360] = useState<File[]>([])
@@ -54,6 +56,7 @@ export default function ProductImageUpload({ params }: { params: { productId: nu
       const res = await adminAPis().updateProductImages(
         productId,
         { images: imagesBase64, images360: images360Base64 },
+        //@ts-ignore
         (event: ProgressEvent) => {
           if (event.total) {
             setProgress(Math.round((event.loaded * 100) / event.total))

@@ -33,14 +33,11 @@ export interface Product {
   isActive: boolean
   images: string[]
   createdAt: string
+  description?:string
+  discountedPrice?:string | number
 }
 
-export interface ProductExpensePayload {
-  materialId: number
-  quantity: number
-  unitPrice: number
-  note?: string
-}
+
 
 export interface ProductImagePayload {
   images: string[]
