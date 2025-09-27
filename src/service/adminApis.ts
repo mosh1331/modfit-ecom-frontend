@@ -185,6 +185,34 @@ export const adminAPis = () => {
           'Content-Type': 'application/json'
         }
       })
-    }
+    },
+    getKpiSummary: () => {
+      return authAPI({
+        method: 'GET',
+        url: `/api/dashboard/summary`,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    },
+     getMonthlySummary: () => {
+      return authAPI({
+        method: 'GET',
+        url: `/api/dashboard/monthly-summary`,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    },
+     getSalesVsExpense: () => {
+      return authAPI({
+        method: 'GET',
+        url: `/api/dashboard/sale-vs-expense`,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    },
+    
   }
 }

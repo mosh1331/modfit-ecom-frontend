@@ -14,21 +14,22 @@ interface Product {
 
 interface Expense {
   id: number
-  materialId: number
-  quantity: number
-  unitPrice: number
+  materialId?: number | null
+  quantity?: number | null
+  unitPrice?: number | null
   totalPrice: number
   note?: string
-  material: any
+  expenseType: string
+  material?: any
 }
 
-
-
 interface MaterialEntry {
-  materialId: number | ''
-  quantity: number
-  unitPrice: number
-  unit: string
+  expenseType: 'material' | 'misc'
+  materialId?: number | ''
+  quantity?: number
+  unitPrice?: number
+  unit?: string
+  totalPrice?: number
   note?: string
 }
 
@@ -36,7 +37,7 @@ export default function AddProductExpenseView({ params }: PageProps) {
   const [product, setProduct] = useState<Product | null>(null)
   const [materials, setMaterials] = useState<any[]>([])
   const [entries, setEntries] = useState<MaterialEntry[]>([
-    { materialId: '', quantity: 0, unitPrice: 0, unit: '' }
+    { expenseType: 'material', materialId: '', quantity: 0, unitPrice: 0, unit: '' }
   ])
   const [price, setPrice] = useState<number>(0)
   const [discountedPrice, setDiscountedPrice] = useState<number | ''>('')
@@ -45,7 +46,6 @@ export default function AddProductExpenseView({ params }: PageProps) {
   //@ts-ignore
   const { productId } = params
 
-  // --- Fetch product detail
   const fetchProduct = async () => {
     const res = await adminAPis().getProductDetail(productId)
     if (res?.status === 200) {
@@ -56,55 +56,58 @@ export default function AddProductExpenseView({ params }: PageProps) {
     setLoading(false)
   }
 
-  // --- Fetch materials
   const fetchMaterials = async () => {
     const res = await adminAPis().getMaterials()
     if (res?.status === 200) setMaterials(res.data)
   }
 
-  // --- Handle material selection (auto-fill unit & unitPrice)
   const handleMaterialChange = (index: number, materialId: number) => {
     const material = materials.find(m => m.id === materialId)
     if (!material) return
 
     const updated = [...entries]
     updated[index].materialId = material.id
-    updated[index].unitPrice = material.unitPrice ?? 0 // assuming backend provides unitPrice in Material
+    updated[index].unitPrice = material.avgUnitPrice ?? 0
     updated[index].unit = material.unit
     setEntries(updated)
   }
 
-  // --- Update entry field
-  const updateEntry = (
-    index: number,
-    field: keyof MaterialEntry,
-    value: string | number
-  ) => {
+  const updateEntry = (index: number, field: keyof MaterialEntry, value: any) => {
     const updated = [...entries]
-    ;(updated[index][field] as any) = value
+    //@ts-ignore
+    updated[index][field] = value
     setEntries(updated)
   }
 
-  // --- Add new row
   const addEntryRow = () => {
-    setEntries([...entries, { materialId: '', quantity: 0, unitPrice: 0, unit: '' }])
+    setEntries([...entries, { expenseType: 'material', materialId: '', quantity: 0, unitPrice: 0, unit: '' }])
   }
 
-  // --- Submit handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const expenses = entries
-      .filter(e => e.materialId && e.quantity > 0)
-      .map(e => ({
-        materialId: e.materialId,
-        quantity: e.quantity,
-        unitPrice: e.unitPrice,
-        note: e.note
-      }))
+    const expenses = entries.map(e => {
+      if (e.expenseType === 'material') {
+        return {
+          materialId: e.materialId,
+          quantity: e.quantity,
+          unitPrice: e.unitPrice,
+          note: e.note
+        }
+      } else {
+        return {
+          materialId: null,
+          quantity: null,
+          unitPrice: null,
+          totalPrice: e.totalPrice,
+          expenseType: e.expenseType,
+          note: e.note
+        }
+      }
+    })
 
     if (expenses.length === 0) {
-      return alert('Please add at least one material expense')
+      return alert('Please add at least one expense')
     }
 
     const payload = {
@@ -116,7 +119,7 @@ export default function AddProductExpenseView({ params }: PageProps) {
     const res = await adminAPis().updateProductExpense(productId, payload)
     if (res?.status === 201 || res?.status === 200) {
       fetchProduct()
-      setEntries([{ materialId: '', quantity: 0, unitPrice: 0, unit: '' }])
+      setEntries([{ expenseType: 'material', materialId: '', quantity: 0, unitPrice: 0, unit: '' }])
     }
   }
 
@@ -128,16 +131,15 @@ export default function AddProductExpenseView({ params }: PageProps) {
   if (loading) return <p className="p-6 text-gray-500">Loading...</p>
   if (!product) return <p className="p-6 text-red-500">Product not found</p>
 
-  // --- Live totals
-  const newExpensesTotal = entries.reduce((sum, e) => sum + e.quantity * e.unitPrice, 0)
-  const totalCost = product.expenses.reduce((sum, e) => sum + e.totalPrice, 0) + newExpensesTotal
-  const margin =
-    price && totalCost ? ((price - totalCost) / totalCost) * 100 : null
-  const discountMargin =
-    discountedPrice && totalCost
-      ? (((+discountedPrice) - totalCost) / totalCost) * 100
-      : null
+  const newExpensesTotal = entries.reduce((sum, e) => {
+    if (e.expenseType === 'material') return sum + (e.quantity || 0) * (e.unitPrice || 0)
+    return sum + (e.totalPrice || 0)
+  }, 0)
 
+  const totalCost = product.expenses.reduce((sum, e) => sum + e.totalPrice, 0) + newExpensesTotal
+  const margin = price && totalCost ? ((price - totalCost) / totalCost) * 100 : null
+  const discountMargin = discountedPrice && totalCost ? ((+discountedPrice - totalCost) / totalCost) * 100 : null
+console.log(materials,'materials')
   return (
     <div className="p-6 space-y-6">
       {/* Product Info */}
@@ -146,14 +148,10 @@ export default function AddProductExpenseView({ params }: PageProps) {
         <p className="text-gray-600 dark:text-gray-300">{product.description}</p>
         <div className="mt-4 space-y-2">
           <p><span className="font-semibold">Base Price:</span> ₹{product.price}</p>
-          {product.discount && (
-            <p><span className="font-semibold">Discounted Price:</span> ₹{product.discount}</p>
-          )}
+          {product.discount && <p><span className="font-semibold">Discounted Price:</span> ₹{product.discount}</p>}
           <p><span className="font-semibold">Total Existing Cost:</span> ₹{totalCost}</p>
           <p><span className="font-semibold">Margin:</span> {margin !== null ? `${margin.toFixed(2)}%` : '—'}</p>
-          {discountMargin !== null && (
-            <p><span className="font-semibold">Margin @ Discount:</span> {discountMargin.toFixed(2)}%</p>
-          )}
+          {discountMargin !== null && <p><span className="font-semibold">Margin @ Discount:</span> {discountMargin.toFixed(2)}%</p>}
         </div>
       </div>
 
@@ -173,7 +171,6 @@ export default function AddProductExpenseView({ params }: PageProps) {
                 required
               />
             </div>
-
             <div className="flex flex-col">
               <label className="text-sm font-medium mb-1">Discounted Price (optional)</label>
               <input
@@ -185,47 +182,89 @@ export default function AddProductExpenseView({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Material Rows */}
-          {entries.map((entry, index) => (
-            <div key={index} className="grid gap-4 md:grid-cols-5 items-end border-b pb-4 mb-4">
+          {/* Expense Rows */}
+          {entries.map((entry, index) => {
+            console.log(entry,'entry')
+            return (
+                 <div key={index} className="grid gap-4 md:grid-cols-6 items-end border-b pb-4 mb-4">
               <div className="flex flex-col">
-                <label className="text-sm font-medium mb-1">Material</label>
+                <label className="text-sm font-medium mb-1">Expense Type</label>
                 <select
-                  value={entry.materialId}
-                  onChange={e => handleMaterialChange(index, Number(e.target.value))}
+                  value={entry.expenseType}
+                  onChange={e => updateEntry(index, 'expenseType', e.target.value)}
                   className="border rounded-lg p-2"
                   required
                 >
-                  <option value="">Select Material</option>
-                  {materials.map(m => (
-                    <option key={m.id} value={m.id}>
-                      {m.title} ({m.unit})
-                    </option>
-                  ))}
+                  <option value="material">Material</option>
+                  <option value="misc">Misc/Other</option>
                 </select>
               </div>
 
-              <div className="flex flex-col">
-                <label className="text-sm font-medium mb-1">Quantity ({entry.unit || ''})</label>
-                <input
-                  type="number"
-                  value={entry.quantity}
-                  onChange={e => updateEntry(index, 'quantity', Number(e.target.value))}
-                  className="border rounded-lg p-2"
-                  required
-                />
-              </div>
+              {entry.expenseType === 'material' && (
+                <>
+                  <div className="flex flex-col">
+                    <label className="text-sm font-medium mb-1">Material</label>
+                    <select
+                      value={entry.materialId}
+                      onChange={e => handleMaterialChange(index, Number(e.target.value))}
+                      className="border rounded-lg p-2"
+                      required
+                    >
+                      <option value="">Select Material</option>
+                      {materials.map(m => (
+                        <option key={m.id} value={m.id}>
+                          {m.title} ({m.unit})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div className="flex flex-col">
-                <label className="text-sm font-medium mb-1">Unit Price</label>
-                <input
-                  type="number"
-                  value={entry.unitPrice}
-                  onChange={e => updateEntry(index, 'unitPrice', Number(e.target.value))}
-                  className="border rounded-lg p-2"
-                  required
-                />
-              </div>
+                  <div className="flex flex-col">
+                    <label className="text-sm font-medium mb-1">Quantity ({entry.unit || ''})</label>
+                    <input
+                      type="number"
+                      value={entry.quantity}
+                      onChange={e => updateEntry(index, 'quantity', Number(e.target.value))}
+                      className="border rounded-lg p-2"
+                      required
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label className="text-sm font-medium mb-1">Unit Price</label>
+                    <input
+                      type="number"
+                      value={entry.unitPrice}
+                      onChange={e => updateEntry(index, 'unitPrice', Number(e.target.value))}
+                      className="border rounded-lg p-2"
+                      required
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label className="text-sm font-medium mb-1">Total</label>
+                    <input
+                      type="number"
+                      value={(entry.quantity || 0) * (entry.unitPrice || 0)}
+                      readOnly
+                      className="border rounded-lg p-2 bg-gray-600"
+                    />
+                  </div>
+                </>
+              )}
+
+              {entry.expenseType === 'misc' && (
+                <div className="flex flex-col col-span-3">
+                  <label className="text-sm font-medium mb-1">Total Price</label>
+                  <input
+                    type="number"
+                    value={entry.totalPrice || 0}
+                    onChange={e => updateEntry(index, 'totalPrice', Number(e.target.value))}
+                    className="border rounded-lg p-2"
+                    required
+                  />
+                </div>
+              )}
 
               <div className="flex flex-col">
                 <label className="text-sm font-medium mb-1">Note</label>
@@ -236,25 +275,16 @@ export default function AddProductExpenseView({ params }: PageProps) {
                   className="border rounded-lg p-2"
                 />
               </div>
-
-              <div className="flex flex-col">
-                <label className="text-sm font-medium mb-1">Total</label>
-                <input
-                  type="number"
-                  value={entry.quantity * entry.unitPrice}
-                  readOnly
-                  className="border rounded-lg p-2 bg-gray-100"
-                />
-              </div>
             </div>
-          ))}
+            )
+          })}
 
           <button
             type="button"
             onClick={addEntryRow}
             className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600"
           >
-            ➕ Add Another Material
+            ➕ Add Another Expense
           </button>
 
           <button
