@@ -13,6 +13,8 @@ export default function Header() {
   const dropdownRef = useRef<HTMLDivElement>(null)
   const dispatch = useDispatch()
 
+  console.log(user,'user')
+
   const toggleMenu = () => setMenuOpen((prev) => !prev)
 
   // 🔄 Close dropdown on click outside
@@ -29,6 +31,8 @@ export default function Header() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+
 
   return (
     <header className='w-full bg-black shadow p-4 flex justify-between items-center relative z-50'>
@@ -63,9 +67,13 @@ export default function Header() {
                 `}
               >
                 <p className='px-4 py-2 text-sm text-gray-600'>Hi, {user?.name || 'User'}</p>
-                <Link href='/profile' className='block px-4 py-2 hover:bg-gray-100'>
+                {/* 
+                //@ts-ignore */}
+                {user?.isAdmin ? <Link href='/admin/dashboard' className='block px-4 py-2 hover:bg-gray-100'>
+                  Dashboard
+                </Link>:<Link href='/profile' className='block px-4 py-2 hover:bg-gray-100'>
                   My Profile
-                </Link>
+                </Link>}
                 <Link href='/cart' className='block px-4 py-2 hover:bg-gray-100'>
                   My Cart
                 </Link>

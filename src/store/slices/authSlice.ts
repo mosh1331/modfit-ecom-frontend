@@ -6,7 +6,8 @@ interface AuthState {
   user: {
     id: number
     name: string
-    role: 'user' | 'admin'
+    role?: 'user' | 'admin'
+    isAdmin?:Boolean
     email?: string | null
   } | null
   loading: boolean
