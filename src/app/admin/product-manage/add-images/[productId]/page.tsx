@@ -149,7 +149,7 @@ export default function ProductImageUpload({ params }:  PageProps) {
         disabled={uploading}
         className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
       >
-        {uploading ? `Uploading... ${progress}%` : "Upload & Activate Product"}
+        {uploading ? `Uploading... ${progress}%` : "Upload Images"}
       </button>
     </div>
   )
