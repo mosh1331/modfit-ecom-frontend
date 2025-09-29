@@ -79,7 +79,7 @@ export default function CreateProduct() {
 
       setLoading(false)
       alert('Product created successfully!')
-      router.push('/admin/products')
+      router.push('/admin/product-manage')
     } catch (err) {
       console.error(err)
       setLoading(false)
