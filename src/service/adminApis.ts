@@ -1,8 +1,5 @@
 import { authAPI } from '@/api/apiRequest'
-import {
-  MaterialPayload,
-  MaterialPurchasePayload
-} from '@/type/productType'
+import { MaterialPayload, MaterialPurchasePayload } from '@/type/productType'
 
 export const adminAPis = () => {
   return {
@@ -84,7 +81,7 @@ export const adminAPis = () => {
         }
       })
     },
-    getPartnerInvestmentsById: (partnerId: number|string) => {
+    getPartnerInvestmentsById: (partnerId: number | string) => {
       return authAPI({
         method: 'GET',
         url: `/api/partner/${partnerId}`,
@@ -135,10 +132,7 @@ export const adminAPis = () => {
       })
     },
 
-    updateProductExpense: (
-      id: Number | String,
-      data: any
-    ) => {
+    updateProductExpense: (id: Number | String, data: any) => {
       return authAPI({
         method: 'POST',
         url: `/api/products/update-expense/${id}`,
@@ -205,7 +199,7 @@ export const adminAPis = () => {
         }
       })
     },
-     getMonthlySummary: () => {
+    getMonthlySummary: () => {
       return authAPI({
         method: 'GET',
         url: `/api/dashboard/monthly-summary`,
@@ -214,7 +208,7 @@ export const adminAPis = () => {
         }
       })
     },
-     getSalesVsExpense: () => {
+    getSalesVsExpense: () => {
       return authAPI({
         method: 'GET',
         url: `/api/dashboard/sale-vs-expense`,
@@ -223,6 +217,14 @@ export const adminAPis = () => {
         }
       })
     },
-    
+    getProductsForAdmin: () => {
+      return authAPI({
+        method: 'GET',
+        url: '/api/products/admin',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+    }
   }
 }

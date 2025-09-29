@@ -5,13 +5,13 @@ import { Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
-import { fetchProducts } from '@/store/slices/productSlice'
+import { fetchProducts, fetchProductsForAdmin } from '@/store/slices/productSlice'
 
 export default function ProductsListAdmin () {
   const dispatch = useDispatch<AppDispatch>()
 
   const {
-    items: products,
+    adminItems: products,
     loading,
     error
   } = useSelector((state: RootState) => state.products)
@@ -19,7 +19,7 @@ export default function ProductsListAdmin () {
   console.log(products, 'product')
 
   useEffect(() => {
-    dispatch(fetchProducts())
+    dispatch(fetchProductsForAdmin())
   }, [dispatch])
 
   return (
