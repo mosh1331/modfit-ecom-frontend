@@ -42,7 +42,7 @@ export default function Header() {
 
       <div className='space-x-4 flex items-center text-white'>
         {!isLoggedIn ? (
-          <Link href='/auth/login' className='text-blue-400 hover:underline'>
+          <Link href='/auth/login' className='text-white hover:underline'>
             Login
           </Link>
         ) : (
