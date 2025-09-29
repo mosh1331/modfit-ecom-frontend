@@ -158,6 +158,16 @@ export const adminAPis = () => {
         data
       })
     },
+    updateProductStatus: (id: Number | String, data: any) => {
+      return authAPI({
+        method: 'POST',
+        url: `/api/products/activate/${id}`,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data
+      })
+    },
     getProductDetail: (productId: number) => {
       return authAPI({
         method: 'GET',

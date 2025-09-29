@@ -68,7 +68,7 @@ export default function ProductView ({
         isActive: !product.isActive
       })
       if (res?.status === 200) {
-        setProduct({ ...product, isActive: !product.isActive })
+        fetchProduct()
       }
     } catch (err) {
       console.error('Error updating status', err)
