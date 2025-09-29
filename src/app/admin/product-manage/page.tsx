@@ -66,19 +66,19 @@ export default function ProductsListAdmin () {
                 <div className='mt-4 flex flex-col gap-2'>
                   <Link
                     href={`/admin/product-manage/detail-view/${p.id}`}
-                    className='cursor-pointer w-full bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg py-2 text-sm'
+                    className='cursor-pointer text-center w-full bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg py-2 text-sm'
                   >
                     View
                   </Link>
                   <Link
                     href={`/admin/product-manage/add-expense/${p.id}`}
-                    className='w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2 text-sm'
+                    className='w-full bg-blue-600 text-center hover:bg-blue-700 text-white rounded-lg py-2 text-sm'
                   >
                     Add Materials
                   </Link>
                   <Link
                     href={`/admin/product-manage/add-images/${p.id}`}
-                    className='w-full bg-purple-600 hover:bg-purple-700 text-white rounded-lg py-2 text-sm'
+                    className='w-full bg-purple-600 text-center hover:bg-purple-700 text-white rounded-lg py-2 text-sm'
                   >
                     Upload Images
                   </Link>

@@ -46,7 +46,7 @@ const AdminHeader = ({ onToggleSidebar }: { onToggleSidebar: () => void }) => {
           <div className='flex items-center gap-2'>
             <Shirt className='h-6 w-6' />
             <span className='font-semibold text-lg tracking-tight'>
-              Clothing Biz Admin
+              Modtif Admin
             </span>
             <span className='text-xs bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full'>
               v0.1
